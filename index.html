@@ -1,375 +1,381 @@
-import React, { useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { Search, Wand2, Trash2, Copy, AlertTriangle, CheckCircle2, Settings2 } from "lucide-react";
-
-// =============================================================
-// Lifeinvader Ad Formatter — EN-03 Policy Aware (Updated)
-// Key fixes:
-// - Strict action-based suffix: Buying→Budget, Selling/Selling or trading→Price, Renting out→Rent,
-//   Trading→no suffix (unless an explicit amount is present).
-// - Strips *any* existing Price/Budget/Rent fragments (including “Negotiable”) before re-appending.
-// - Keeps # rules: № symbol, thousand dots, Million wording, period rules, term substitutions, blacklist.
-// =============================================================
-
-function capitalizeFirst(str: string): string {
-  if (!str) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function ensureFinalPeriod(sentence: string): string {
-  if (!sentence) return sentence;
-  // If it ends with a number, do not add a period.
-  if (/\d$/.test(sentence)) return sentence;
-  if (/[.!?]$/.test(sentence)) return sentence;
-  return sentence + ".";
-}
-
-function normalizeSpaces(s: string): string {
-  return s.replace(/\s+/g, " ").trim();
-}
-
-function toNumber(value: string): number | null {
-  if (!value) return null;
-  let v = value.trim().toLowerCase();
-  v = v.replace(/[$,\s]/g, "");
-
-  // e.g. 1k / 1.7k
-  if (/^[0-9]+(\.[0-9]+)?k$/.test(v)) return Math.round(parseFloat(v.replace("k", "")) * 1000);
-  // e.g. 1m / 1.45m
-  if (/^[0-9]+(\.[0-9]+)?m$/.test(v)) return Math.round(parseFloat(v.replace("m", "")) * 1_000_000);
-  // 1.500 style
-  if (/^[0-9]+(\.[0-9]{3})*$/.test(v)) return parseInt(v.replace(/\./g, ""), 10);
-  // 1,500 style
-  if (/^[0-9]+(,[0-9]{3})*$/.test(v)) return parseInt(v.replace(/,/g, ""), 10);
-  // plain 1500 or 1500.5
-  if (/^[0-9]+(\.[0-9]+)?$/.test(v)) return parseFloat(v);
-
-  return null;
-}
-
-function formatMoneyAccordingToPolicy(n: number): string {
-  // ≥ 1,000,000 -> $X[.YY] Million
-  if (n >= 1_000_000) {
-    const m = Math.round((n / 1_000_000) * 100) / 100;
-    return `$${m} Million`;
-  }
-  // thousands use dot separators: 1500 -> $1.500
-  const withDots = n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return `$${withDots}`;
-}
-
-// -----------------------------
-// Policy tables
-// -----------------------------
-
-const BLACKLIST = [
-  "firearm","gun","pistol","rifle","ammunition","bullet","bulletproof vest","armor plate","armor plates",
-  "weed","cannabis","cocaine","drug","drugs",
-  "ems surgical mask","surgical mask","medical mask","covid mask","ems mask",
-  "scanner","radar","anti-radar","vehicle scanner","human scanner","resource scanner",
-  "balaclava","bandit mask",
-  "rope","ropes","lockpick","lock pick","lock-pick","crowbar","crow bar",
-  "animal skin","satellite dish","barricade","engine block","air horn",
-  "nationality","sale of people","sexual","sex","buying a wife","buying a husband",
-];
-
-const SUBS: Array<[RegExp, string]> = [
-  [/\blooking to buy\b/gi, "Buying"],
-  [/\blooking to purchase\b/gi, "Buying"],
-  [/\blook(?:ing)? for\b/gi, "Looking for"],
-  [/\bgreen zone\b/gi, ""],
-  [/\bmax config\b/gi, "full configuration"],
-  [/\bmax tuning\b/gi, "full configuration"],
-  [/\bfully upgraded\b/gi, "full configuration"],
-  [/\bnearly max\b/gi, "partial configuration"],
-  [/\b(part)?lvl\s*([1-4])\b/gi, (_m, _p, d) => {
-    const map: any = {1: "low quality", 2: "medium quality", 3: "high quality", 4: "max quality"};
-    return map[d] || "high quality";
-  }],
-  [/\bbody (?:upgrades|kit)\b/gi, "visual upgrades"],
-  [/\bturbo\b/gi, "turbo kit"],
-  [/\bdrift tuning|drift assistance\b/gi, "drift kit"],
-  [/\bluminous (?:rims|unique wheels?)\b/gi, "luminous wheels"],
-  [/\bextras\b/gi, "type"],
-  [/\bcase(s)?\b/gi, "container$1"],
-  [/\bcases\b/gi, "containers"],
-  [/\bcrates\b/gi, "containers"],
-  [/\bspray (?:cans|balloons)\b/gi, "paint cans"],
-  [/\bmonowheel\s*type\s*(\d+)/gi, "Monowheel of type $1"],
-];
-
-function normalizePropertyNumber(s: string): string {
-  return s
-    .replace(/\b(house|apartment|penthouse|mansion)\s*(no\.|no|number|#)\s*(\d+)/gi, (_m, t, _n, num) => `${t} №${num}`)
-    .replace(/\b№\s*(\d+)/g, (_m, d) => `№${d}`);
-}
-
-function detectAction(raw: string): "Selling" | "Buying" | "Trading" | "Selling or trading" | "Renting out" | null {
-  const s = raw.toLowerCase();
-  if (/\brenting out\b/.test(s)) return "Renting out";
-  if (/\bselling or trading\b/.test(s)) return "Selling or trading";
-  if (/\btrading\b/.test(s)) return "Trading";
-  if (/\bbuying\b/.test(s)) return "Buying";
-  if (/\bselling\b/.test(s)) return "Selling";
-  if (/\blooking to buy|looking to purchase\b/.test(s)) return "Buying";
-  return null;
-}
-
-function extractExplicitAmount(raw: string): { amount: number | null } {
-  const match = raw.match(/\$?\s*([0-9]+(?:[.,][0-9]+)*(?:k|m)?)/i);
-  if (match) {
-    const n = toNumber(match[1]);
-    return { amount: n ?? null };
-  }
-  return { amount: null };
-}
-
-function containsBlacklist(raw: string): string | null {
-  const s = raw.toLowerCase();
-  for (const term of BLACKLIST) if (s.includes(term)) return term;
-  return null;
-}
-
-function stripPriceFragments(text: string): string {
-  // Remove *any* Price/Budget/Rent fragments before we append the correct one.
-  return text
-    // with numbers: "Price: $1.500", "Budget $10 Million"
-    .replace(/\b(?:price|budget|rent)\s*[:=]?\s*\$?[0-9.,]+(?:\s*(?:million|m))?\.?/gi, "")
-    // with words only: "Price: Negotiable.", "Budget: firm."
-    .replace(/\b(?:price|budget|rent)\s*[:=]?\s*(?:negotiable|firm|fixed|obo|no ?negotiation|none|n\/a)\.?/gi, "");
-}
-
-// ---------------------------------
-// Main formatter
-// ---------------------------------
-
-function formatAd(rawInput: string): { ok: boolean; output: string; reason?: string } {
-  if (!rawInput || !rawInput.trim()) return { ok: false, output: "", reason: "Empty input" };
-
-  let raw = normalizeSpaces(rawInput);
-
-  // Safety: blacklist
-  const bad = containsBlacklist(raw);
-  if (bad) return { ok: false, output: "", reason: `Cannot promote illegal/blacklisted content: "${bad}"` };
-
-  // Substitutions and normalizations
-  for (const [rx, rep] of SUBS) raw = raw.replace(rx, rep as any);
-  raw = normalizePropertyNumber(raw);
-
-  // Detect action (default to Selling unless the user started with Looking for)
-  let action = detectAction(raw);
-  if (!action) {
-    if (!/^looking for\b/i.test(raw)) {
-      raw = `Selling ${raw}`;
-      action = "Selling";
-    }
-  }
-
-  // Amount handling
-  const { amount } = extractExplicitAmount(raw);
-  const trailer = amount !== null ? formatMoneyAccordingToPolicy(amount) : "Negotiable";
-
-  // STRICT key by action (policy):
-  // Buying → Budget | Selling/Selling or trading → Price | Renting out → Rent | Trading → none (unless amount exists)
-  let priceKey: "Price" | "Budget" | "Rent" | null = "Price";
-  if (action === "Buying") priceKey = "Budget";
-  else if (action === "Renting out") priceKey = "Rent";
-  else if (action === "Trading") priceKey = null; // default: no suffix for Trading
-  else priceKey = "Price"; // Selling / Selling or trading
-
-  // Remove any pre-existing suffix before appending the correct one
-  raw = stripPriceFragments(raw).trim();
-
-  // Tidy punctuation
-  raw = raw.replace(/\s{2,}/g, " ").replace(/\s*\.$/, "");
-  raw = capitalizeFirst(raw);
-
-  // Assemble
-  let sentence = raw;
-  if (priceKey) {
-    sentence = `${sentence}. ${priceKey}: ${trailer}`.trim();
-  } else if (amount !== null) {
-    // Trading but a number was explicitly given: use Price per policy examples style
-    sentence = `${sentence}. Price: ${trailer}`.trim();
-  }
-
-  // Final polish
-  sentence = normalizeSpaces(sentence);
-  sentence = ensureFinalPeriod(sentence);
-  sentence = sentence
-    .replace(/\b(Budget|Price|Rent)\s*:\s*\./g, "$1: Negotiable.")
-    .replace(/\s+\./g, ".");
-
-  return { ok: true, output: sentence };
-}
-
-// Bulk helper
-function processBulk(text: string): { rows: Array<{ input: string; result: string; ok: boolean; reason?: string }> } {
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const rows = lines.map(line => {
-    const r = formatAd(line);
-    return { input: line, result: r.output, ok: r.ok, reason: r.reason };
-  });
-  return { rows };
-}
-
-// ---------------------------------
-// UI
-// ---------------------------------
-
-export default function App() {
-  const [input, setInput] = useState("");
-  const [bulk, setBulk] = useState("");
-  const [showSettings, setShowSettings] = useState(false);
-
-  const single = useMemo(() => formatAd(input), [input]);
-  const bulkRows = useMemo(() => processBulk(bulk), [bulk]);
-
-  const copy = async (txt: string) => {
-    try { await navigator.clipboard.writeText(txt); } catch {}
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <header className="sticky top-0 z-10 bg-white border-b">
-        <div className="max-w-5xl mx-auto flex items-center gap-3 px-4 py-3">
-          <Wand2 className="w-6 h-6" />
-          <h1 className="text-xl font-semibold">Lifeinvader Ad Formatter</h1>
-          <span className="text-xs text-gray-500 ml-2">EN-03 policy aware</span>
-          <button onClick={() => setShowSettings(v=>!v)} className="ml-auto inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border hover:bg-gray-50">
-            <Settings2 className="w-4 h-4"/> Settings
-          </button>
-        </div>
-      </header>
-
-      {showSettings && (
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="p-4 rounded-2xl border bg-white text-sm text-gray-700 mb-6">
-            <p className="mb-2 font-medium">How it follows the policy</p>
-            <ul className="list-disc ml-5 space-y-1">
-              <li><b>Buying → Budget</b>, <b>Selling/Selling or trading → Price</b>, <b>Renting out → Rent</b>, <b>Trading → no suffix</b> unless an amount is present.</li>
-              <li>Always strips any typed <i>Price/Budget/Rent</i> (even “Negotiable.”) before adding the correct line.</li>
-              <li>Converts 1k/1.7k/1m → <code>$1.000/$1.700/$1 Million</code>. Uses dot separators and “Million”.</li>
-              <li>Property numbers normalize to <code>№</code>; common terms auto-correct (extras→type, turbo→turbo kit, etc.).</li>
-              <li>Full stop at the end unless the ad ends with a number.</li>
-            </ul>
-          </div>
-        </div>
-      )}
-
-      <main className="max-w-5xl mx-auto px-4 py-6 grid gap-6 lg:grid-cols-2">
-        {/* Quick Mode */}
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Search className="w-5 h-5"/>
-            <h2 className="font-semibold">Quick format</h2>
-          </div>
-          <div className="bg-white border rounded-2xl p-4 shadow-sm">
-            <textarea
-              value={input}
-              onChange={e=>setInput(e.target.value)}
-              placeholder='Try: "Buying Plantation business. Price: Negotiable."'
-              className="w-full min-h-[120px] outline-none resize-y rounded-xl p-3 bg-gray-50 focus:bg-white"
-            />
-            <div className="mt-4">
-              {single.ok ? (
-                <motion.div initial={{opacity:0,y:4}} animate={{opacity:1,y:0}} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-1"/>
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-800">Formatted ad</div>
-                    <div className="mt-1 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm">
-                      {single.output}
-                    </div>
-                    <div className="mt-2 flex gap-2">
-                      <button onClick={()=>copy(single.output)} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border hover:bg-gray-50"><Copy className="w-4 h-4"/> Copy</button>
-                      <button onClick={()=>setInput("")} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-gray-600 hover:bg-gray-50"><Trash2 className="w-4 h-4"/> Clear</button>
-                    </div>
-                  </div>
-                </motion.div>
-              ) : (
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-amber-600 mt-1"/>
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-800">Rejected</div>
-                    <div className="mt-1 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-                      {single.reason}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Bulk Mode */}
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Wand2 className="w-5 h-5"/>
-            <h2 className="font-semibold">Bulk format</h2>
-          </div>
-          <div className="bg-white border rounded-2xl p-4 shadow-sm">
-            <textarea
-              value={bulk}
-              onChange={e=>setBulk(e.target.value)}
-              placeholder={'Paste multiple raw ads, one per line.\nExample:\nBuying Plantation business. Price: Negotiable.\nSelling seeds 1.5k each\nTrading "Ubermacht M5 (E34)" for "Grotti Italia (F458)"'}
-              className="w-full min-h-[180px] outline-none resize-y rounded-xl p-3 bg-gray-50 focus:bg-white"
-            />
-
-            <div className="mt-4 space-y-2 max-h-72 overflow-auto pr-1">
-              {bulkRows.rows.map((r, i) => (
-                <div key={i} className="border rounded-xl p-3 flex items-start gap-3">
-                  {r.ok ? <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-1"/> : <AlertTriangle className="w-4 h-4 text-amber-600 mt-1"/>}
-                  <div className="flex-1">
-                    <div className="text-xs text-gray-500">{r.input}</div>
-                    {r.ok ? (
-                      <div className="mt-1 text-sm">{r.result}</div>
-                    ) : (
-                      <div className="mt-1 text-sm text-amber-700">{r.reason}</div>
-                    )}
-                  </div>
-                  {r.ok && (
-                    <button onClick={()=>copy(r.result)} className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-1 rounded-lg border hover:bg-gray-50"><Copy className="w-3 h-3"/> Copy</button>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {bulk && (
-              <div className="mt-3 flex gap-2">
-                <button onClick={()=>copy(bulkRows.rows.filter(r=>r.ok).map(r=>r.result).join("\n"))} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border hover:bg-gray-50"><Copy className="w-4 h-4"/> Copy all formatted</button>
-                <button onClick={()=>setBulk("")} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-gray-600 hover:bg-gray-50"><Trash2 className="w-4 h-4"/> Clear</button>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Learn by example */}
-        <section className="lg:col-span-2">
-          <div className="bg-white border rounded-2xl p-4 shadow-sm">
-            <div className="flex items-center gap-2 mb-3"><Search className="w-5 h-5"/><h2 className="font-semibold">Try these</h2></div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
-              {[
-                'Buying Plantation business. Price: Negotiable.',
-                'selling house no 85',
-                'looking to buy car 1.7m',
-                'trading ubermacht m5 for grotti italia',
-                'renting out house no 1023 with garden and 5 gs 100k per week',
-                'selling monowheel type 2',
-                'selling luminous rims',
-              ].map((ex, i) => (
-                <button key={i} onClick={()=>setInput(ex)} className="text-left px-3 py-2 rounded-xl border hover:bg-gray-50">
-                  <span className="block text-gray-500">Raw:</span>
-                  <span className="block font-medium">{ex}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="max-w-5xl mx-auto px-4 pb-10 text-xs text-gray-500">
-        Built for Lifeinvader EN-03 policy. Update rule tables as policy evolves.
-      </footer>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lifeinvader Ads Formatter</title>
+  <style>
+    :root{--bg:#0b0d10;--card:#12161b;--muted:#9aa4b2;--text:#e7edf5;--accent:#5dd4fa;--good:#22c55e;--bad:#ef4444}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;background:linear-gradient(180deg,#0b0d10,#0f1318 40%,#0b0d10);color:var(--text)}
+    header{position:sticky;top:0;background:rgba(11,13,16,.8);backdrop-filter:blur(8px);border-bottom:1px solid #1f2937;z-index:10}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+    h1{font-size:20px;margin:0;display:flex;gap:10px;align-items:center}
+    .badge{font-size:12px;color:#0b0d10;background:var(--accent);padding:2px 8px;border-radius:999px}
+    main{max-width:1100px;margin:24px auto;padding:0 18px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+    .card{background:var(--card);border:1px solid #1f2937;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .card h2{font-size:16px;margin:0;padding:14px 16px;border-bottom:1px solid #1f2937;color:#cbd5e1}
+    .card .body{padding:14px 16px}
+    textarea, input[type="text"]{width:100%;background:#0c1116;color:var(--text);border:1px solid #202936;border-radius:12px;padding:12px;font:inherit;outline:none}
+    textarea{min-height:150px;resize:vertical}
+    .row{display:flex;gap:10px;align-items:center}
+    .row > *{flex:1}
+    .btn{appearance:none;background:#1f2937;color:#d6e1ee;border:1px solid #2a3444;padding:10px 14px;border-radius:12px;cursor:pointer;transition:.15s}
+    .btn:hover{transform:translateY(-1px);border-color:#3a465a}
+    .btn.primary{background:var(--accent);color:#06202a;border-color:#38bdf8;font-weight:600}
+    .hint{color:var(--muted);font-size:12px}
+    .out{background:#0c1116;border:1px dashed #334155;border-radius:12px;padding:12px;min-height:64px;white-space:pre-wrap}
+    .status{margin-top:8px;font-size:12px}
+    .status.good{color:var(--good)}
+    .status.bad{color:var(--bad)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .list-head{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+    .table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    .table tr{background:#0c1116}
+    .table td{padding:10px 12px;border-top:1px solid #243041;border-bottom:1px solid #243041}
+    .table tr td:first-child{border-left:1px solid #243041;border-top-left-radius:10px;border-bottom-left-radius:10px}
+    .table tr td:last-child{border-right:1px solid #243041;border-top-right-radius:10px;border-bottom-right-radius:10px}
+    code.k{background:#0f1720;border:1px solid #1e293b;padding:2px 6px;border-radius:6px}
+    footer{max-width:1100px;margin:20px auto 60px;padding:0 18px;color:#7f8b99;font-size:12px}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid #283446;background:#0f141a;color:#b9c5d6;font-size:11px}
+    .nowrap{white-space:nowrap}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Lifeinvader Ads Formatter <span class="badge">EN‑03 Policy Aware</span></h1>
     </div>
-  );
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1) Paste Raw Ad → Get Perfected Ad</h2>
+      <div class="body">
+        <div class="grid">
+          <div>
+            <label class="hint">Raw ad text</label>
+            <textarea id="raw" placeholder="e.g. selling house no 85, cheap price"></textarea>
+            <div class="row" style="margin-top:10px">
+              <button class="btn primary" id="formatBtn">Format Ad</button>
+              <button class="btn" id="addBtn" title="Add formatted ad to the list">Add to List</button>
+              <button class="btn" id="clearBtn">Clear</button>
+            </div>
+          </div>
+          <div>
+            <label class="hint">Formatted output (policy‑compliant)</label>
+            <div id="out" class="out"></div>
+            <div id="status" class="status"></div>
+            <div class="hint" style="margin-top:8px">Rules applied:
+              <span class="pill">Capitalization</span>
+              <span class="pill">№ for property numbers</span>
+              <span class="pill">Price/Budget logic</span>
+              <span class="pill">$ + thousand dots</span>
+              <span class="pill">k/m → numeric/Million</span>
+              <span class="pill">Final period</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2) Saved Ads + Search</h2>
+      <div class="body">
+        <div class="list-head">
+          <input id="q" type="text" placeholder="Search saved ads (live)…" />
+          <button class="btn" id="copyAll">Copy All</button>
+          <button class="btn" id="exportBtn" title="Download .txt of all ads">Export</button>
+        </div>
+        <table class="table" id="adsTable"><tbody></tbody></table>
+        <div class="hint">Tip: Use <code class="k">Format Ad</code> to preview, then <code class="k">Add to List</code>. Search matches text live.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    This tool normalizes ads to Lifeinvader EN‑03 internal policy: capitalization, number sign (№), money style, and required
+    <span class="nowrap">Price/Budget</span>. Illegal/blacklisted terms trigger a red warning.
+  </footer>
+
+<script>
+/**************************************
+ * Lifeinvader Ad Formatter (EN‑03)
+ * Single‑file, no dependencies.
+ **************************************/
+const el = id => document.getElementById(id);
+const rawEl = el('raw');
+const outEl = el('out');
+const statusEl = el('status');
+const tableBody = document.querySelector('#adsTable tbody');
+const qEl = el('q');
+
+// Minimal blacklist (extend as needed per policy)
+const BLACKLIST = [
+  'firearm','gun','ammunition','bulletproof','armor plate','weed','cannabis','cocaine','drug',
+  'balaclava','ems mask','surgical mask','covid mask','vehicle scanner','human scanner','radar',
+  'rope ','head bag','usb with virus','lock pick','crowbar','bandit mask','animal skin','anti-radar','barricade','engine block','air horn'
+];
+
+// Helper: trim spaces, single spacing
+const tidySpaces = s => s.replace(/[\t\n\r]+/g,' ').replace(/\s{2,}/g,' ').trim();
+
+// Helper: title case first letter of full ad
+const capFirst = s => s.length ? s[0].toUpperCase() + s.slice(1) : s;
+
+// Helper: normalize property number markers → №
+function normalizePropertyNumbers(s){
+  // house no 85, house number 85, house #85 → house №85
+  s = s.replace(/\b(no\.|no|number|#)\s*(\d{1,5})\b/gi, '№$2');
+  // ensure space before № when missing (e.g., house№85)
+  s = s.replace(/(house|apartment|penthouse|mansion)(\s*)№/gi, (m,a,b)=> a + ' №');
+  return s;
 }
+
+// Helper: detect intent (Buying/Selling/Trading/Selling or trading) including synonyms
+function detectIntent(s){
+  const L = s.toLowerCase();
+  if(/selling\s*or\s*trading|sell(ing)?\s*\/\s*trad(ing)?/i.test(L)) return 'Selling or trading';
+  if(/\bbuy(ing)?\b|looking\s*to\s*buy|looking\s*to\s*purchase|want\s*to\s*buy/i.test(L)) return 'Buying';
+  if(/\btrading\b|\btrade\b/i.test(L)) return 'Trading';
+  if(/\bsell(ing)?\b|for\s*sale/i.test(L)) return 'Selling';
+  return null; // unknown → will infer from presence of price/budget later
+}
+
+// Helper: money formatting
+function toThousandDots(n){
+  // keep decimals with dot; thousands separator is dot per policy
+  const [int, dec] = String(n).split('.');
+  const withDots = int.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return dec ? `${withDots}.${dec}` : withDots;
+}
+
+function normalizeMoneyTokens(text){
+  // Convert k/m shorthands and ensure $ and correct separators.
+  // 1k → $1.000 ; 1.7k → $1.700 ; 1m → $1 Million ; 1.450k → $1.45 Million
+  let s = text;
+  s = s.replace(/\$?\s*(\d{1,3}(?:[\.,]\d{1,3})?)\s*m\b/gi, (m, a)=>{
+    // "1.5m" → "$1.5 Million"
+    const val = a.replace(',', '.');
+    return `$${val} Million`;
+  });
+  s = s.replace(/\$?\s*(\d{1,3}(?:[\.,]\d{1,3})?)\s*k\b/gi, (m, a)=>{
+    // "1.7k" → "$1.700"
+    const val = a.replace(',', '.');
+    // multiply by 1000 while keeping 3 decimals max
+    const num = parseFloat(val) * 1000;
+    // keep decimals only if not integer
+    const repr = Number.isInteger(num) ? toThousandDots(num) : toThousandDots(num.toFixed(0));
+    return `$${repr}`;
+  });
+  // Format bare $ amounts: $1500 → $1.500, also 1500$ → $1.500
+  s = s.replace(/(\d[\d,\.]*?)\$/g, '$$$1'); // move trailing $ to front
+  s = s.replace(/\$\s*(\d[\d,\.]*)/g, (m, digits)=>{
+    const clean = digits.replace(/,/g,'').replace(/\.(?=\d{1,2}$)/,'#DOT#');
+    // after temp mark, remove stray dots, then restore decimal dot
+    const onlyDigits = clean.replace(/\./g,'');
+    const restored = onlyDigits.replace('#DOT#','.');
+    const parts = restored.split('.');
+    const intPart = parts[0];
+    const dec = parts[1];
+    const fmt = toThousandDots(intPart) + (dec?'.'+dec:'');
+    return `$${fmt}`;
+  });
+  return s;
+}
+
+// Extract first explicit $amount or X Million following Price/Budget terms
+function hasExplicitMoney(s){
+  return /\$(\d|\.)+|\b\d+(?:\.\d+)?\s*Million\b/i.test(s);
+}
+
+function ensurePriceOrBudget(line, intent){
+  let s = line;
+  const hasPrice = /\bPrice\s*:/i.test(s);
+  const hasBudget = /\bBudget\s*:/i.test(s);
+
+  if(!hasPrice && !hasBudget){
+    const needsPrice = intent === 'Selling' || intent === 'Trading' || intent === 'Selling or trading';
+    const tag = needsPrice ? 'Price' : 'Budget';
+    const tail = hasExplicitMoney(s) ? '' : ' Negotiable';
+    s = s.replace(/\.?\s*$/,'');
+    s += `. ${tag}:` + (tail ? `${tail}.` : '');
+  } else {
+    // Normalize capitalization and add period if missing
+    s = s.replace(/\b(price|budget)\s*:/gi, (m,p)=> p[0].toUpperCase()+p.slice(1).toLowerCase()+':');
+    if(/\b(Negotiable)\b/i.test(s)) s = s.replace(/\bnegotiable\b/ig,'Negotiable');
+    if(!/[\.!?]$/.test(s) && !/\d$/.test(s)) s += '.';
+  }
+  return s;
+}
+
+function endsWithNumberThenNoDot(s){
+  return s.replace(/\.$/,'').replace(/(\d)\.$/, '$1');
+}
+
+function autoRewritePhrases(s){
+  // looking to buy → Buying; to align with policy terms
+  s = s.replace(/\blooking\s*to\s*buy\b/ig, 'Buying');
+  s = s.replace(/\blooking\s*to\s*purchase\b/ig, 'Buying');
+  // If ad starts with sell/buy/trade words, normalize to canonical capitalized form
+  s = s.replace(/^\s*sell(ing)?\b/i, 'Selling');
+  s = s.replace(/^\s*buy(ing)?\b/i, 'Buying');
+  s = s.replace(/^\s*trade(ing)?\b/i, 'Trading');
+  return s;
+}
+
+function buildAd(raw){
+  let s = tidySpaces(raw);
+  if(!s) return {text:'', ok:false, reason:'Empty input'};
+
+  // Preliminary rewrites
+  s = autoRewritePhrases(s);
+  s = normalizePropertyNumbers(s);
+
+  // Detect intent
+  let intent = detectIntent(s);
+
+  // If no explicit intent, infer by cues
+  if(!intent){
+    if(/\bprice\b|\bfor sale\b/i.test(s)) intent = 'Selling';
+    else if(/\bbudget\b|\bwtb\b/i.test(s)) intent = 'Buying';
+  }
+
+  // Ensure action word at the beginning and capitalize first letter
+  if(intent){
+    // Remove any existing leading action text to avoid duplicates, then prepend canonical
+    s = s.replace(/^(\s*)(selling\s*or\s*trading|selling|buying|trading)\b\s*[,\-:]?/i,'').trim();
+    s = `${intent} ${s}`.trim();
+  }
+
+  // Money normalization
+  s = normalizeMoneyTokens(s);
+
+  // Guarantee Price/Budget line
+  s = ensurePriceOrBudget(s, intent || 'Buying');
+
+  // Capitalize first letter and clean punctuation rules
+  s = capFirst(s);
+  s = s.replace(/\s+\./g,'.');
+  s = endsWithNumberThenNoDot(s);
+
+  // Fix SIM card spacing: SIM card №77-77-777
+  s = s.replace(/SIM\s*card\s*№\s*(\S+)/i, (m, num) => `SIM card № ${num}`);
+
+  // Disallow commas in prices → use dots
+  s = s.replace(/\$(\d{1,3}),(\d{3})/g, (m,a,b)=> `$${a}.${b}`);
+
+  // Final tidy
+  s = tidySpaces(s);
+
+  // Blacklist check
+  const hit = BLACKLIST.find(w => new RegExp(`\\b${w}\\b`, 'i').test(s));
+  const ok = !hit;
+  const reason = hit ? `Contains a blacklisted term: "${hit}"` : '';
+
+  return {text:s, ok, reason};
+}
+
+// UI handlers
+function renderStatus(ok, reason){
+  if(ok){
+    statusEl.className = 'status good';
+    statusEl.textContent = '✅ Format OK';
+  } else {
+    statusEl.className = 'status bad';
+    statusEl.textContent = `⛔ ${reason}`;
+  }
+}
+
+function formatNow(){
+  const {text, ok, reason} = buildAd(rawEl.value);
+  outEl.textContent = text;
+  renderStatus(ok, reason);
+}
+
+function addRow(text){
+  const tr = document.createElement('tr');
+  const td1 = document.createElement('td');
+  const td2 = document.createElement('td');
+  td1.textContent = text;
+  td2.style.width = '140px';
+  td2.innerHTML = `<div class="row">\n    <button class="btn" data-act="copy">Copy</button>\n    <button class="btn" data-act="del">Delete</button>\n  </div>`;
+  tr.appendChild(td1); tr.appendChild(td2);
+  tableBody.appendChild(tr);
+}
+
+// Filter rows by search query
+function filterRows(){
+  const q = qEl.value.toLowerCase();
+  for(const tr of tableBody.querySelectorAll('tr')){
+    const text = tr.firstChild.textContent.toLowerCase();
+    tr.style.display = text.includes(q) ? '' : 'none';
+  }
+}
+
+// Event wiring
+el('formatBtn').addEventListener('click', formatNow);
+rawEl.addEventListener('input', ()=>{ /* live preview optional; keep manual for control */ });
+
+el('addBtn').addEventListener('click', ()=>{
+  if(!outEl.textContent.trim()) formatNow();
+  const {text, ok, reason} = buildAd(rawEl.value);
+  if(!text) return;
+  if(!ok){
+    renderStatus(ok, reason);
+    alert('This ad contains blacklisted terms and should be rejected.');
+    return;
+  }
+  addRow(text);
+  outEl.textContent = '';
+  rawEl.value = '';
+  renderStatus(true,'');
+});
+
+el('clearBtn').addEventListener('click', ()=>{
+  rawEl.value = '';
+  outEl.textContent = '';
+  statusEl.textContent = '';
+});
+
+qEl.addEventListener('input', filterRows);
+
+tableBody.addEventListener('click', (e)=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const tr = btn.closest('tr');
+  const text = tr.firstChild.textContent;
+  const act = btn.dataset.act;
+  if(act === 'copy'){
+    navigator.clipboard.writeText(text);
+    btn.textContent = 'Copied!';
+    setTimeout(()=>btn.textContent='Copy',900);
+  } else if(act === 'del'){
+    tr.remove();
+  }
+});
+
+el('copyAll').addEventListener('click', ()=>{
+  const lines = [...tableBody.querySelectorAll('tr')].map(tr=>tr.firstChild.textContent).join('\n');
+  if(!lines){ alert('No ads to copy.'); return; }
+  navigator.clipboard.writeText(lines);
+  el('copyAll').textContent = 'Copied All!';
+  setTimeout(()=> el('copyAll').textContent = 'Copy All', 900);
+});
+
+el('exportBtn').addEventListener('click', ()=>{
+  const lines = [...tableBody.querySelectorAll('tr')].map(tr=>tr.firstChild.textContent).join('\n');
+  const blob = new Blob([lines||''], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'lifeinvader_ads.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+});
+
+// Demo examples to try quickly
+rawEl.placeholder = 'Examples you can try:\n• selling house no 85\n• looking to buy plane budget 1.7m\n• Selling video cards 60k each\n• selling SIM card #77-77-777 23k\n• trading toros for karin tundra 2021\n• buying luminous wheels type 4 and 6\n• Party at the beach';
+
+</script>
+</body>
+</html>
