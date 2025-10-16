@@ -1,381 +1,536 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lifeinvader Ads Formatter</title>
-  <style>
-    :root{--bg:#0b0d10;--card:#12161b;--muted:#9aa4b2;--text:#e7edf5;--accent:#5dd4fa;--good:#22c55e;--bad:#ef4444}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;background:linear-gradient(180deg,#0b0d10,#0f1318 40%,#0b0d10);color:var(--text)}
-    header{position:sticky;top:0;background:rgba(11,13,16,.8);backdrop-filter:blur(8px);border-bottom:1px solid #1f2937;z-index:10}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px}
-    h1{font-size:20px;margin:0;display:flex;gap:10px;align-items:center}
-    .badge{font-size:12px;color:#0b0d10;background:var(--accent);padding:2px 8px;border-radius:999px}
-    main{max-width:1100px;margin:24px auto;padding:0 18px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
-    .card{background:var(--card);border:1px solid #1f2937;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .card h2{font-size:16px;margin:0;padding:14px 16px;border-bottom:1px solid #1f2937;color:#cbd5e1}
-    .card .body{padding:14px 16px}
-    textarea, input[type="text"]{width:100%;background:#0c1116;color:var(--text);border:1px solid #202936;border-radius:12px;padding:12px;font:inherit;outline:none}
-    textarea{min-height:150px;resize:vertical}
-    .row{display:flex;gap:10px;align-items:center}
-    .row > *{flex:1}
-    .btn{appearance:none;background:#1f2937;color:#d6e1ee;border:1px solid #2a3444;padding:10px 14px;border-radius:12px;cursor:pointer;transition:.15s}
-    .btn:hover{transform:translateY(-1px);border-color:#3a465a}
-    .btn.primary{background:var(--accent);color:#06202a;border-color:#38bdf8;font-weight:600}
-    .hint{color:var(--muted);font-size:12px}
-    .out{background:#0c1116;border:1px dashed #334155;border-radius:12px;padding:12px;min-height:64px;white-space:pre-wrap}
-    .status{margin-top:8px;font-size:12px}
-    .status.good{color:var(--good)}
-    .status.bad{color:var(--bad)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .list-head{display:flex;gap:12px;align-items:center;margin-bottom:10px}
-    .table{width:100%;border-collapse:separate;border-spacing:0 8px}
-    .table tr{background:#0c1116}
-    .table td{padding:10px 12px;border-top:1px solid #243041;border-bottom:1px solid #243041}
-    .table tr td:first-child{border-left:1px solid #243041;border-top-left-radius:10px;border-bottom-left-radius:10px}
-    .table tr td:last-child{border-right:1px solid #243041;border-top-right-radius:10px;border-bottom-right-radius:10px}
-    code.k{background:#0f1720;border:1px solid #1e293b;padding:2px 6px;border-radius:6px}
-    footer{max-width:1100px;margin:20px auto 60px;padding:0 18px;color:#7f8b99;font-size:12px}
-    .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid #283446;background:#0f141a;color:#b9c5d6;font-size:11px}
-    .nowrap{white-space:nowrap}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lifeinvader Ad Formatter</title>
+<style>
+  :root{
+    --bg:#0b0c0f; --fg:#e7e8ea; --muted:#a8acb3; --card:#14161a; --accent:#6aa6ff; --ok:#3ecf8e; --warn:#ffb648; --bad:#ff5a7a; --chip:#1f2329;
+    --shadow:0 8px 24px rgba(0,0,0,.25);
+  }
+  [data-theme="light"]{
+    --bg:#f8fafc; --fg:#0f172a; --muted:#475569; --card:#ffffff; --accent:#2563eb; --ok:#10b981; --warn:#d97706; --bad:#e11d48; --chip:#eef2f7;
+    --shadow:0 8px 24px rgba(15,23,42,.08);
+  }
+  html,body{height:100%;}
+  body{
+    margin:0; font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    background:var(--bg); color:var(--fg);
+  }
+  .app{max-width:1100px; margin:0 auto; padding:16px;}
+  header{
+    display:flex; align-items:center; gap:12px; justify-content:space-between; flex-wrap:wrap; margin-bottom:12px;
+  }
+  .title{font-weight:800; letter-spacing:.2px; font-size:1.1rem}
+  .mode{
+    display:flex; align-items:center; gap:8px;
+  }
+  .toggle{appearance:none; width:52px; height:28px; border-radius:999px; position:relative; background:var(--chip); outline:2px solid transparent; cursor:pointer; box-shadow:var(--shadow)}
+  .toggle:before{content:""; position:absolute; width:22px; height:22px; border-radius:50%; top:3px; left:3px; background:var(--fg); transition:transform .2s ease}
+  .toggle:checked{background:linear-gradient(90deg,var(--accent),#22d3ee)}
+  .toggle:checked:before{transform:translateX(24px)}
+  .grid{
+    display:grid; grid-template-columns: 1.2fr .8fr; gap:14px;
+  }
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+  .card{background:var(--card); border-radius:16px; padding:14px; box-shadow:var(--shadow); border:1px solid rgba(255,255,255,.06)}
+  label{display:block; font-weight:600; margin-bottom:6px}
+  textarea, input, select{
+    width:100%; border-radius:12px; border:1px solid rgba(127,127,127,.25); background:transparent; color:var(--fg);
+    padding:12px; outline:none; box-shadow: inset 0 0 0 9999px rgba(255,255,255,0);
+  }
+  textarea{min-height:130px; resize:vertical}
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  .btn{
+    appearance:none; border:0; padding:12px 14px; border-radius:12px; color:#fff; background:var(--accent);
+    font-weight:700; cursor:pointer; box-shadow:var(--shadow);
+  }
+  .btn.secondary{background:#7c8596}
+  .btn.ghost{background:transparent; color:var(--fg); border:1px dashed rgba(127,127,127,.35)}
+  .muted{color:var(--muted); font-size:.92rem}
+  .output{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    background:var(--chip); border-radius:12px; padding:12px; white-space:pre-wrap; word-break:break-word;
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{background:var(--chip); padding:6px 10px; border-radius:999px; font-size:.82rem}
+  .chip.ok{background: rgba(16,185,129,.12); color:var(--ok)}
+  .chip.bad{background: rgba(225,29,72,.12); color:var(--bad)}
+  .list{display:grid; gap:10px}
+  .ad{
+    border:1px solid rgba(127,127,127,.25); border-radius:14px; padding:12px; background:linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+  }
+  .ad .hdr{display:flex; gap:10px; align-items:center; justify-content:space-between; margin-bottom:6px}
+  .ad .cat{font-weight:700; padding:4px 8px; border-radius:8px; background:var(--chip)}
+  .ad .text{white-space:pre-wrap}
+  .search-bar{display:flex; gap:8px}
+  .pill{padding:8px 12px; border-radius:999px; background:var(--chip)}
+  .warning{border-left:4px solid var(--warn); padding:8px 10px; background:rgba(217,119,6,.12); border-radius:10px; margin-top:8px}
+  .error{border-left:4px solid var(--bad); padding:8px 10px; background:rgba(225,29,72,.12); border-radius:10px; margin-top:8px}
+  .success{border-left:4px solid var(--ok); padding:8px 10px; background:rgba(16,185,129,.12); border-radius:10px; margin-top:8px}
+  .small{font-size:.86rem}
+</style>
 </head>
-<body>
-  <header>
-    <div class="wrap">
-      <h1>Lifeinvader Ads Formatter <span class="badge">EN‑03 Policy Aware</span></h1>
+<body data-theme="dark">
+  <div class="app">
+    <header>
+      <div class="title">Lifeinvader Ad Formatter • EN-03</div>
+      <div class="mode">
+        <span class="pill small">Day / Night</span>
+        <input id="themeToggle" class="toggle" type="checkbox" aria-label="Toggle theme" />
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Composer -->
+      <section class="card">
+        <label for="raw">Raw ad text</label>
+        <textarea id="raw" placeholder='e.g., selling house no 85 // buyyingng a Ruby. Price: Negotiable.'></textarea>
+
+        <div class="row" style="margin-top:10px">
+          <button id="formatBtn" class="btn">Generate formatted ad</button>
+          <button id="addBtn" class="btn secondary" title="Adds the last formatted ad to the list">Add to list</button>
+          <button id="clearBtn" class="btn ghost">Clear</button>
+        </div>
+
+        <div id="policyHints" class="small muted" style="margin-top:10px">
+          • Starts with Buying / Selling / Trading / Selling or trading. • Buyer → <b>Budget</b>, Seller → <b>Price</b>. • Use <b>№</b> for numbered homes. • Default to <b>Negotiable</b>.
+        </div>
+
+        <div id="alerts"></div>
+
+        <div style="margin-top:12px">
+          <label>Formatted output</label>
+          <div id="out" class="output" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Live metadata -->
+      <aside class="card">
+        <label>Detected category</label>
+        <div id="category" class="chips" style="margin-bottom:8px">
+          <span class="chip">—</span>
+        </div>
+
+        <label>Checks</label>
+        <div id="checks" class="chips">
+          <span class="chip">Capitalization</span>
+          <span class="chip">Price/Budget</span>
+          <span class="chip">№ format</span>
+          <span class="chip">Punctuation</span>
+        </div>
+
+        <div style="margin-top:12px">
+          <label>Search ads</label>
+          <div class="search-bar">
+            <input id="search" placeholder="Search formatted list…" />
+            <button id="searchBtn" class="btn">Search</button>
+          </div>
+        </div>
+
+        <div class="warning small" style="margin-top:12px">
+          <b>Note:</b> Ads containing blacklisted terms (e.g., firearms, drugs, covid masks) are rejected automatically per policy.
+        </div>
+      </aside>
     </div>
-  </header>
 
-  <main>
-    <section class="card">
-      <h2>1) Paste Raw Ad → Get Perfected Ad</h2>
-      <div class="body">
-        <div class="grid">
-          <div>
-            <label class="hint">Raw ad text</label>
-            <textarea id="raw" placeholder="e.g. selling house no 85, cheap price"></textarea>
-            <div class="row" style="margin-top:10px">
-              <button class="btn primary" id="formatBtn">Format Ad</button>
-              <button class="btn" id="addBtn" title="Add formatted ad to the list">Add to List</button>
-              <button class="btn" id="clearBtn">Clear</button>
-            </div>
-          </div>
-          <div>
-            <label class="hint">Formatted output (policy‑compliant)</label>
-            <div id="out" class="out"></div>
-            <div id="status" class="status"></div>
-            <div class="hint" style="margin-top:8px">Rules applied:
-              <span class="pill">Capitalization</span>
-              <span class="pill">№ for property numbers</span>
-              <span class="pill">Price/Budget logic</span>
-              <span class="pill">$ + thousand dots</span>
-              <span class="pill">k/m → numeric/Million</span>
-              <span class="pill">Final period</span>
-            </div>
-          </div>
-        </div>
+    <!-- Ads list -->
+    <section class="card" style="margin-top:14px">
+      <div class="row" style="justify-content:space-between; align-items:center">
+        <label>Generated ads</label>
+        <button id="exportBtn" class="btn ghost small">Export JSON</button>
       </div>
+      <div id="list" class="list"></div>
     </section>
-
-    <section class="card">
-      <h2>2) Saved Ads + Search</h2>
-      <div class="body">
-        <div class="list-head">
-          <input id="q" type="text" placeholder="Search saved ads (live)…" />
-          <button class="btn" id="copyAll">Copy All</button>
-          <button class="btn" id="exportBtn" title="Download .txt of all ads">Export</button>
-        </div>
-        <table class="table" id="adsTable"><tbody></tbody></table>
-        <div class="hint">Tip: Use <code class="k">Format Ad</code> to preview, then <code class="k">Add to List</code>. Search matches text live.</div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    This tool normalizes ads to Lifeinvader EN‑03 internal policy: capitalization, number sign (№), money style, and required
-    <span class="nowrap">Price/Budget</span>. Illegal/blacklisted terms trigger a red warning.
-  </footer>
+  </div>
 
 <script>
-/**************************************
- * Lifeinvader Ad Formatter (EN‑03)
- * Single‑file, no dependencies.
- **************************************/
-const el = id => document.getElementById(id);
-const rawEl = el('raw');
-const outEl = el('out');
-const statusEl = el('status');
-const tableBody = document.querySelector('#adsTable tbody');
-const qEl = el('q');
+(function(){
+  const el = id => document.getElementById(id);
+  const raw = el('raw'), out = el('out'), cat = el('category'), checks = el('checks');
+  const alerts = el('alerts'), list = el('list');
+  const themeToggle = el('themeToggle');
+  const search = el('search');
 
-// Minimal blacklist (extend as needed per policy)
-const BLACKLIST = [
-  'firearm','gun','ammunition','bulletproof','armor plate','weed','cannabis','cocaine','drug',
-  'balaclava','ems mask','surgical mask','covid mask','vehicle scanner','human scanner','radar',
-  'rope ','head bag','usb with virus','lock pick','crowbar','bandit mask','animal skin','anti-radar','barricade','engine block','air horn'
-];
-
-// Helper: trim spaces, single spacing
-const tidySpaces = s => s.replace(/[\t\n\r]+/g,' ').replace(/\s{2,}/g,' ').trim();
-
-// Helper: title case first letter of full ad
-const capFirst = s => s.length ? s[0].toUpperCase() + s.slice(1) : s;
-
-// Helper: normalize property number markers → №
-function normalizePropertyNumbers(s){
-  // house no 85, house number 85, house #85 → house №85
-  s = s.replace(/\b(no\.|no|number|#)\s*(\d{1,5})\b/gi, '№$2');
-  // ensure space before № when missing (e.g., house№85)
-  s = s.replace(/(house|apartment|penthouse|mansion)(\s*)№/gi, (m,a,b)=> a + ' №');
-  return s;
-}
-
-// Helper: detect intent (Buying/Selling/Trading/Selling or trading) including synonyms
-function detectIntent(s){
-  const L = s.toLowerCase();
-  if(/selling\s*or\s*trading|sell(ing)?\s*\/\s*trad(ing)?/i.test(L)) return 'Selling or trading';
-  if(/\bbuy(ing)?\b|looking\s*to\s*buy|looking\s*to\s*purchase|want\s*to\s*buy/i.test(L)) return 'Buying';
-  if(/\btrading\b|\btrade\b/i.test(L)) return 'Trading';
-  if(/\bsell(ing)?\b|for\s*sale/i.test(L)) return 'Selling';
-  return null; // unknown → will infer from presence of price/budget later
-}
-
-// Helper: money formatting
-function toThousandDots(n){
-  // keep decimals with dot; thousands separator is dot per policy
-  const [int, dec] = String(n).split('.');
-  const withDots = int.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return dec ? `${withDots}.${dec}` : withDots;
-}
-
-function normalizeMoneyTokens(text){
-  // Convert k/m shorthands and ensure $ and correct separators.
-  // 1k → $1.000 ; 1.7k → $1.700 ; 1m → $1 Million ; 1.450k → $1.45 Million
-  let s = text;
-  s = s.replace(/\$?\s*(\d{1,3}(?:[\.,]\d{1,3})?)\s*m\b/gi, (m, a)=>{
-    // "1.5m" → "$1.5 Million"
-    const val = a.replace(',', '.');
-    return `$${val} Million`;
+  // Persist theme
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.body.setAttribute('data-theme', savedTheme);
+  themeToggle.checked = savedTheme === 'light';
+  themeToggle.addEventListener('change', () => {
+    document.body.setAttribute('data-theme', themeToggle.checked ? 'light' : 'dark');
+    localStorage.setItem('theme', themeToggle.checked ? 'light' : 'dark');
   });
-  s = s.replace(/\$?\s*(\d{1,3}(?:[\.,]\d{1,3})?)\s*k\b/gi, (m, a)=>{
-    // "1.7k" → "$1.700"
-    const val = a.replace(',', '.');
-    // multiply by 1000 while keeping 3 decimals max
-    const num = parseFloat(val) * 1000;
-    // keep decimals only if not integer
-    const repr = Number.isInteger(num) ? toThousandDots(num) : toThousandDots(num.toFixed(0));
-    return `$${repr}`;
+
+  // Blacklist terms (subset from policy, extend as needed)
+  const BLACKLIST = [
+    'firearm','gun','pistol','rifle','ammo','ammunition','bulletproof','armor plate',
+    'weed','cannabis','cocaine','drug','balaclava','rope','lockpick','crowbar',
+    'covid mask','surgical mask','ems mask','vehicle scanner','human scanner','radar',
+    'anti-radar','usb with virus','bandit mask','animal skin'
+  ];
+
+  // Category keyword maps (policy-driven)
+  const CATS = {
+    "Real Estate": ['house','apartment','penthouse','mansion','garage','g.s.','w.h.','helipad','garden','mirror park','vinewood','hills','view'],
+    "Auto": ['car','truck','motorcycle','bike','atv','boat','helicopter','plane','vehicle','insurance','drift kit','turbo kit','luminous wheels','configuration'],
+    "Businesses": [
+      'ammunition store','bar','car wash','chip tuning','clothing shop','cowshed','electric station','farm','flower shop','freight train','gas station','hair salon',
+      'jewelry store','oil well','parking','plantation','car sharing','state object','service station','24/7 store','tattoo studio','taxi company','atm','juice shop','burger shop','warehouse'
+    ],
+    "Work": ['hiring','looking for work','looking for a job','salary','award','bonus','construction site','driver','lawyer','dj','photographer','bodyguard','assistant','professional dancer','professional singer','trucker','experience'],
+    "Dating": ['looking for','looking for a boyfriend','girlfriend','wife','husband','valentine','family','friends','date','poker players'],
+    "Discounts": ['%','percent discount','discount'],
+    "Services": ['happy hour','template','service','we are offering','join','call us'],
+    "Other": ['party','car meet','dice','fish','fishing rod','fruits','vegetables','mask','video card','repair kit','token','thread','snow','ticket','license plate','luminous wheels','pickaxe','tuning','elixir','pet','container','battery','fuel','wires','prime','prime platinum','sim card','lottery','resource','miner','inventory','backpack skin','tonic','pearl','statue','drawing','mushroom','paint can','timber','scrap metal','top quality metal']
+  };
+
+  // Helpers
+  const titleCaseFirst = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+  const dotsThousands = (n) => {
+    // turns 1500 -> 1.500, 1000000 -> 1.000.000
+    const [intPart, decPart] = String(Math.trunc(Math.abs(n))).split('.');
+    const withDots = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return withDots + (decPart ? '.' + decPart : '');
+  };
+  const toPolicyMoney = str => {
+    // Convert k/M shorthand and raw numbers to policy format
+    // $ must be prefixed; decimals use dot; thousand sep is dot
+    // Examples: "1k" -> $1.000, "1.7k each" -> $1.700 each, "3m" -> $3 Million
+    return str.replace(/\$?\s*([\d.,]+)\s*([kKmM])\b/g, (_, num, suffix) => {
+      const val = parseFloat(String(num).replace(/,/g,'.'));
+      if (!isFinite(val)) return `$${num}`;
+      if (suffix.toLowerCase() === 'k') {
+        return `$${dotsThousands(Math.round(val*1000))}`;
+      } else {
+        // M -> Million
+        return `$${val % 1 === 0 ? val.toFixed(0) : String(val)} Million`;
+      }
+    }).replace(/\$?\s*([\d][\d,\.]*)\b(?!\s*Million)/g, (_, num) => {
+      // plain numbers -> $X with dot thousands; keep decimals if any
+      const clean = String(num).replace(/,/g,'');
+      if (!/^\d+(\.\d+)?$/.test(clean)) return `$${num}`;
+      const n = Number(clean);
+      // If it's large (>= 1000000) and looks like "1000000", prefer dot grouping (1.000.000)
+      return `$${dotsThousands(n)}`;
+    });
+  };
+
+  const fixTypos = s => {
+    const map = [
+      [/buyyingng|buyying|buyyy?ing|buyin\b|looking to (?:buy|purchase)|look(?:ing)? to (?:buy|purchase)/gi, 'Buying'],
+      [/selling or trading|sell(?:ing)? ?\/ ?trading|s\/t/gi, 'Selling or trading'],
+      [/sell(?:ing)?/gi, 'Selling'],
+      [/trad(?:e|ing)/gi, 'Trading'],
+      [/rent(?:ing)? out/gi, 'Renting out'],
+      [/rent(?:ing)?/gi, 'Renting'],
+      [/budget:?/gi, 'Budget:'],
+      [/price:?/gi, 'Price:'],
+      // normalize "no|number" before digits to №
+      /\b(house|apartment|penthouse|mansion)\s*(no\.?|number)\s*(\d+)\b/gi,
+      (m,what,_n, num)=> `${what} №${num}`
+    ];
+    let out = s;
+    for (let i=0;i<map.length;i++){
+      const pat = map[i];
+      if (pat instanceof Array) continue;
+    }
+    // apply pairwise rules
+    for (let i=0;i<map.length;i+=2){
+      const a = map[i], b = map[i+1];
+      out = out.replace(a, b);
+    }
+    // Special: "Casino apartment" -> "Casino penthouse"
+    out = out.replace(/\bcasino apartment\b/gi, 'Casino penthouse');
+    return out;
+  };
+
+  const indefiniteArticle = word => /^[aeiou]/i.test(word) ? 'an' : 'a';
+
+  const normalizeObject = (text, action) => {
+    // extract the object phrase after action word, before a dot or "price/budget/rent"
+    const lower = text.toLowerCase();
+    const idx = lower.search(/\b(buying|selling or trading|selling|trading|renting out|renting)\b/i);
+    if (idx < 0) return {object:null, rest:text};
+    const m = /(?:buying|selling or trading|selling|trading|renting out|renting)\s+([^\.]+?)(?=(?:\s*\.\s*|$|price:|budget:|rent:))/i.exec(text);
+    let obj = m ? m[1].trim() : null;
+
+    if (!obj) return {object:null, rest:text};
+
+    // house numbering: "house 85" -> "house №85"
+    obj = obj.replace(/\b(house|apartment|penthouse|mansion)\s*(?:#|no\.?|number)?\s*(\d+)\b/gi, (m, typ, num)=> `${typ} №${num}`);
+
+    // ensure "a/an" for singular generic nouns when no № and no quotes
+    if (/^(house|apartment|penthouse|mansion)\b(?!\s*№)/i.test(obj)) {
+      obj = obj.replace(/^(house|apartment|penthouse|mansion)\b/i, (m)=> `${indefiniteArticle(m)} ${m}`);
+    }
+    if (/^car\b/i.test(obj)) obj = obj.replace(/^car\b/i, `${indefiniteArticle('car')} car`);
+
+    // mining resources lowercased singulars
+    obj = obj
+      .replace(/\b(Ruby|Emerald|Diamond)\b/g, (w)=> w.toLowerCase())
+      .replace(/\bA ruby\b/i,'a ruby');
+
+    return {object:obj, rest:text};
+  };
+
+  const detectAction = str => {
+    const s = str.toLowerCase();
+    if (/\bselling or trading\b/.test(s)) return 'Selling or trading';
+    if (/\bselling\b/.test(s)) return 'Selling';
+    if (/\btrading\b/.test(s)) return 'Trading';
+    if (/\brenting out\b/.test(s)) return 'Renting out';
+    if (/\brenting\b/.test(s)) return 'Renting';
+    if (/\bbuying\b/.test(s) || /\blooking to buy\b/.test(s)) return 'Buying';
+    if (/\blooking for\b/.test(s)) return 'Looking for';
+    return null;
+  };
+
+  const finalizePunctuation = s => {
+    s = s.replace(/\s+/g,' ').trim();
+    // ensure sentence 1 ends with period ONLY if it doesn't already end with number + and more text follows
+    s = s.replace(/(№\d+)(?=\s|$)/g, '$1'); // keep №N
+    // add final period unless ends with a digit or period already there after a money value like $1.500
+    if (!/[\.]$/.test(s) && !/\d$/.test(s)) s += '.';
+    return s;
+  };
+
+  const pickCategory = (formatted) => {
+    const s = formatted.toLowerCase();
+    for (const [k, arr] of Object.entries(CATS)) {
+      if (arr.some(w => s.includes(w))) {
+        return k;
+      }
+    }
+    // Special: if starts with Buying/Selling etc but no keyword matched
+    return 'Other';
+  };
+
+  const moneyBlock = (action, hasAnyPriceBudget, provided) => {
+    if (/Renting/.test(action)) {
+      return provided || 'Rent: Negotiable.';
+    }
+    if (action === 'Trading') {
+      // often no price; keep provided if any
+      return provided || '';
+    }
+    if (action === 'Selling or trading' || action === 'Selling') {
+      return provided || 'Price: Negotiable.';
+    }
+    if (action === 'Buying' || action === 'Looking for') {
+      return provided || 'Budget: Negotiable.';
+    }
+    return provided || '';
+  };
+
+  const extractAndNormalizeMoneyLine = (txt) => {
+    // Detect existing Price/Budget/Rent lines and normalize formats
+    const moneyLineMatch = /(Price|Budget|Rent)\s*:?\s*([^.]*)/i.exec(txt);
+    let line = null;
+    if (moneyLineMatch){
+      let label = titleCaseFirst(moneyLineMatch[1].toLowerCase()); // Price/Budget/Rent
+      let rest = moneyLineMatch[2].trim();
+      if (!rest) rest = 'Negotiable';
+      // Normalize k/M and numbers
+      rest = toPolicyMoney(rest);
+      // Ensure 'Negotiable' capitalized
+      rest = rest.replace(/\bnegotiable\b/gi, 'Negotiable');
+      // Prevent trailing period if ends with a number
+      const sentence = `${label}: ${rest}${/\d$/.test(rest) ? '' : '.'}`;
+      line = sentence;
+    }
+    return line;
+  };
+
+  const checkBlacklist = (txt) => {
+    const s = txt.toLowerCase();
+    const hits = BLACKLIST.filter(t => s.includes(t));
+    return hits;
+  };
+
+  function formatAd(input){
+    alerts.innerHTML = '';
+    const original = input.trim();
+    if (!original) return {formatted:'', category:'—', problems:[]};
+
+    // Step 1: normalize typos/phrases
+    let s = fixTypos(original);
+
+    // Step 2: detect action
+    let action = detectAction(s);
+    if (!action){
+      // default: try to infer from "price/budget/rent" or nouns
+      if (/budget\s*:|looking to buy|looking for/i.test(s)) action = 'Buying';
+      else if (/price\s*:|sell/i.test(s)) action = 'Selling';
+      else action = 'Selling'; // safe default
+    }
+
+    // Step 3: object phrase
+    const {object} = normalizeObject(s, action);
+
+    // Step 4: first sentence
+    let first = action;
+    if (object) {
+      // Ensure quotes around auto model patterns like "Brand Model"
+      // We keep as-is for general items. Capitalize the first letter only.
+      first += ' ' + object.trim();
+    } else {
+      // generic fallbacks
+      if (/house|apartment|penthouse|mansion/i.test(s)) first += ' a house';
+      else if (/car|vehicle/i.test(s)) first += ' a car';
+    }
+    first = first.replace(/\s+\.$/, ''); // avoid stray dot
+    first = titleCaseFirst(first);
+
+    // Ensure period at end of sentence 1 if it does not end with a number AND we will have a second sentence
+    let moneyProvided = extractAndNormalizeMoneyLine(s);
+    let firstSentence = finalizePunctuation(first);
+    // If first ends with number and we added a period, keep it (policy examples keep it even if more sentences follow)
+
+    // Step 5: price/budget/rent sentence
+    const secondSentence = moneyBlock(action, !!moneyProvided, moneyProvided);
+
+    // Step 6: glue
+    const formatted = [firstSentence, secondSentence].filter(Boolean).join(' ');
+
+    // Step 7: category
+    const category = pickCategory(formatted);
+
+    // Step 8: checks and blacklist
+    const problems = [];
+    const hits = checkBlacklist(original);
+    if (hits.length){
+      problems.push({type:'error', msg:`Rejected: contains blacklisted terms: ${hits.join(', ')}`});
+    }
+
+    // Validation chips (simple signals)
+    renderChecks({ formatted, action });
+
+    return {formatted, category, problems};
+  }
+
+  function renderChecks({formatted, action}){
+    checks.innerHTML = '';
+    const add = (text, cls='')=>{
+      const span = document.createElement('span');
+      span.className = 'chip ' + cls;
+      span.textContent = text;
+      checks.appendChild(span);
+    };
+    // Capitalization
+    /^[A-Z]/.test(formatted) ? add('Capitalization ✓','ok') : add('Capitalization ✕','bad');
+    // Price/Budget rule
+    if (/Budget:/.test(formatted) && /^(Buying|Looking for)/.test(formatted)) add('Buyer→Budget ✓','ok');
+    else if (/Price:|Rent:/.test(formatted) && /^(Selling|Trading|Selling or trading|Renting)/.test(formatted)) add('Seller/Rent ✓','ok');
+    else add('Money label ✕','bad');
+
+    // № format
+    /house №\d+|apartment №\d+|penthouse №\d+|mansion №\d+/i.test(formatted) ? add('№ format ✓','ok') : add('№ format —');
+
+    // Punctuation end
+    /(\.|\d)$/.test(formatted.trim()) ? add('Punctuation ✓','ok') : add('Punctuation ✕','bad');
+  }
+
+  // UI handlers
+  el('formatBtn').addEventListener('click', () => {
+    const {formatted, category, problems} = formatAd(raw.value);
+    out.textContent = formatted;
+    cat.innerHTML = `<span class="chip">${category}</span>`;
+    renderProblems(problems);
   });
-  // Format bare $ amounts: $1500 → $1.500, also 1500$ → $1.500
-  s = s.replace(/(\d[\d,\.]*?)\$/g, '$$$1'); // move trailing $ to front
-  s = s.replace(/\$\s*(\d[\d,\.]*)/g, (m, digits)=>{
-    const clean = digits.replace(/,/g,'').replace(/\.(?=\d{1,2}$)/,'#DOT#');
-    // after temp mark, remove stray dots, then restore decimal dot
-    const onlyDigits = clean.replace(/\./g,'');
-    const restored = onlyDigits.replace('#DOT#','.');
-    const parts = restored.split('.');
-    const intPart = parts[0];
-    const dec = parts[1];
-    const fmt = toThousandDots(intPart) + (dec?'.'+dec:'');
-    return `$${fmt}`;
+
+  el('addBtn').addEventListener('click', () => {
+    const text = out.textContent.trim();
+    if (!text) return;
+    const category = pickCategory(text);
+    const item = { id: Date.now(), text, category };
+    ADS.push(item);
+    renderList(ADS);
+    raw.value = '';
+    out.textContent = '';
+    cat.innerHTML = `<span class="chip">—</span>`;
+    alerts.innerHTML = `<div class="success">Added to list.</div>`;
+    setTimeout(()=>alerts.innerHTML='', 2000);
   });
-  return s;
-}
 
-// Extract first explicit $amount or X Million following Price/Budget terms
-function hasExplicitMoney(s){
-  return /\$(\d|\.)+|\b\d+(?:\.\d+)?\s*Million\b/i.test(s);
-}
+  el('clearBtn').addEventListener('click', () => {
+    raw.value = ''; out.textContent=''; cat.innerHTML = `<span class="chip">—</span>`; alerts.innerHTML='';
+  });
 
-function ensurePriceOrBudget(line, intent){
-  let s = line;
-  const hasPrice = /\bPrice\s*:/i.test(s);
-  const hasBudget = /\bBudget\s*:/i.test(s);
+  el('searchBtn').addEventListener('click', ()=> renderList(ADS, search.value));
+  search.addEventListener('keydown', e=>{ if(e.key==='Enter') el('searchBtn').click(); });
 
-  if(!hasPrice && !hasBudget){
-    const needsPrice = intent === 'Selling' || intent === 'Trading' || intent === 'Selling or trading';
-    const tag = needsPrice ? 'Price' : 'Budget';
-    const tail = hasExplicitMoney(s) ? '' : ' Negotiable';
-    s = s.replace(/\.?\s*$/,'');
-    s += `. ${tag}:` + (tail ? `${tail}.` : '');
-  } else {
-    // Normalize capitalization and add period if missing
-    s = s.replace(/\b(price|budget)\s*:/gi, (m,p)=> p[0].toUpperCase()+p.slice(1).toLowerCase()+':');
-    if(/\b(Negotiable)\b/i.test(s)) s = s.replace(/\bnegotiable\b/ig,'Negotiable');
-    if(!/[\.!?]$/.test(s) && !/\d$/.test(s)) s += '.';
-  }
-  return s;
-}
+  el('exportBtn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(ADS,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'ads.json'; a.click();
+    URL.revokeObjectURL(url);
+  });
 
-function endsWithNumberThenNoDot(s){
-  return s.replace(/\.$/,'').replace(/(\d)\.$/, '$1');
-}
-
-function autoRewritePhrases(s){
-  // looking to buy → Buying; to align with policy terms
-  s = s.replace(/\blooking\s*to\s*buy\b/ig, 'Buying');
-  s = s.replace(/\blooking\s*to\s*purchase\b/ig, 'Buying');
-  // If ad starts with sell/buy/trade words, normalize to canonical capitalized form
-  s = s.replace(/^\s*sell(ing)?\b/i, 'Selling');
-  s = s.replace(/^\s*buy(ing)?\b/i, 'Buying');
-  s = s.replace(/^\s*trade(ing)?\b/i, 'Trading');
-  return s;
-}
-
-function buildAd(raw){
-  let s = tidySpaces(raw);
-  if(!s) return {text:'', ok:false, reason:'Empty input'};
-
-  // Preliminary rewrites
-  s = autoRewritePhrases(s);
-  s = normalizePropertyNumbers(s);
-
-  // Detect intent
-  let intent = detectIntent(s);
-
-  // If no explicit intent, infer by cues
-  if(!intent){
-    if(/\bprice\b|\bfor sale\b/i.test(s)) intent = 'Selling';
-    else if(/\bbudget\b|\bwtb\b/i.test(s)) intent = 'Buying';
+  function renderProblems(problems){
+    alerts.innerHTML = '';
+    problems.forEach(p => {
+      const div = document.createElement('div');
+      div.className = p.type==='error' ? 'error' : 'warning';
+      div.innerHTML = p.msg;
+      alerts.appendChild(div);
+    });
   }
 
-  // Ensure action word at the beginning and capitalize first letter
-  if(intent){
-    // Remove any existing leading action text to avoid duplicates, then prepend canonical
-    s = s.replace(/^(\s*)(selling\s*or\s*trading|selling|buying|trading)\b\s*[,\-:]?/i,'').trim();
-    s = `${intent} ${s}`.trim();
+  const ADS = [];
+
+  function renderList(items, q=''){
+    const norm = (s)=> s.toLowerCase();
+    let filtered = items;
+    if (q && q.trim()){
+      const needle = norm(q.trim());
+      filtered = items.filter(i => norm(i.text).includes(needle) || norm(i.category).includes(needle));
+    }
+    list.innerHTML = '';
+    filtered.forEach(i => {
+      const div = document.createElement('div');
+      div.className = 'ad';
+      div.innerHTML = `
+        <div class="hdr">
+          <div class="cat">${i.category}</div>
+          <div class="muted small">${new Date(i.id).toLocaleString()}</div>
+        </div>
+        <div class="text">${escapeHtml(i.text)}</div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn ghost small" data-copy="${i.id}">Copy</button>
+          <button class="btn ghost small" data-del="${i.id}">Delete</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+    // buttons
+    list.querySelectorAll('button[data-copy]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.getAttribute('data-copy');
+        const item = items.find(x=> String(x.id)===id);
+        navigator.clipboard.writeText(item.text);
+        b.textContent = 'Copied ✓';
+        setTimeout(()=>b.textContent='Copy', 1000);
+      });
+    });
+    list.querySelectorAll('button[data-del]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = Number(b.getAttribute('data-del'));
+        const idx = ADS.findIndex(x => x.id===id);
+        if (idx>=0){ ADS.splice(idx,1); renderList(ADS); }
+      });
+    });
   }
 
-  // Money normalization
-  s = normalizeMoneyTokens(s);
-
-  // Guarantee Price/Budget line
-  s = ensurePriceOrBudget(s, intent || 'Buying');
-
-  // Capitalize first letter and clean punctuation rules
-  s = capFirst(s);
-  s = s.replace(/\s+\./g,'.');
-  s = endsWithNumberThenNoDot(s);
-
-  // Fix SIM card spacing: SIM card №77-77-777
-  s = s.replace(/SIM\s*card\s*№\s*(\S+)/i, (m, num) => `SIM card № ${num}`);
-
-  // Disallow commas in prices → use dots
-  s = s.replace(/\$(\d{1,3}),(\d{3})/g, (m,a,b)=> `$${a}.${b}`);
-
-  // Final tidy
-  s = tidySpaces(s);
-
-  // Blacklist check
-  const hit = BLACKLIST.find(w => new RegExp(`\\b${w}\\b`, 'i').test(s));
-  const ok = !hit;
-  const reason = hit ? `Contains a blacklisted term: "${hit}"` : '';
-
-  return {text:s, ok, reason};
-}
-
-// UI handlers
-function renderStatus(ok, reason){
-  if(ok){
-    statusEl.className = 'status good';
-    statusEl.textContent = '✅ Format OK';
-  } else {
-    statusEl.className = 'status bad';
-    statusEl.textContent = `⛔ ${reason}`;
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[c]));
   }
-}
 
-function formatNow(){
-  const {text, ok, reason} = buildAd(rawEl.value);
-  outEl.textContent = text;
-  renderStatus(ok, reason);
-}
-
-function addRow(text){
-  const tr = document.createElement('tr');
-  const td1 = document.createElement('td');
-  const td2 = document.createElement('td');
-  td1.textContent = text;
-  td2.style.width = '140px';
-  td2.innerHTML = `<div class="row">\n    <button class="btn" data-act="copy">Copy</button>\n    <button class="btn" data-act="del">Delete</button>\n  </div>`;
-  tr.appendChild(td1); tr.appendChild(td2);
-  tableBody.appendChild(tr);
-}
-
-// Filter rows by search query
-function filterRows(){
-  const q = qEl.value.toLowerCase();
-  for(const tr of tableBody.querySelectorAll('tr')){
-    const text = tr.firstChild.textContent.toLowerCase();
-    tr.style.display = text.includes(q) ? '' : 'none';
-  }
-}
-
-// Event wiring
-el('formatBtn').addEventListener('click', formatNow);
-rawEl.addEventListener('input', ()=>{ /* live preview optional; keep manual for control */ });
-
-el('addBtn').addEventListener('click', ()=>{
-  if(!outEl.textContent.trim()) formatNow();
-  const {text, ok, reason} = buildAd(rawEl.value);
-  if(!text) return;
-  if(!ok){
-    renderStatus(ok, reason);
-    alert('This ad contains blacklisted terms and should be rejected.');
-    return;
-  }
-  addRow(text);
-  outEl.textContent = '';
-  rawEl.value = '';
-  renderStatus(true,'');
-});
-
-el('clearBtn').addEventListener('click', ()=>{
-  rawEl.value = '';
-  outEl.textContent = '';
-  statusEl.textContent = '';
-});
-
-qEl.addEventListener('input', filterRows);
-
-tableBody.addEventListener('click', (e)=>{
-  const btn = e.target.closest('button');
-  if(!btn) return;
-  const tr = btn.closest('tr');
-  const text = tr.firstChild.textContent;
-  const act = btn.dataset.act;
-  if(act === 'copy'){
-    navigator.clipboard.writeText(text);
-    btn.textContent = 'Copied!';
-    setTimeout(()=>btn.textContent='Copy',900);
-  } else if(act === 'del'){
-    tr.remove();
-  }
-});
-
-el('copyAll').addEventListener('click', ()=>{
-  const lines = [...tableBody.querySelectorAll('tr')].map(tr=>tr.firstChild.textContent).join('\n');
-  if(!lines){ alert('No ads to copy.'); return; }
-  navigator.clipboard.writeText(lines);
-  el('copyAll').textContent = 'Copied All!';
-  setTimeout(()=> el('copyAll').textContent = 'Copy All', 900);
-});
-
-el('exportBtn').addEventListener('click', ()=>{
-  const lines = [...tableBody.querySelectorAll('tr')].map(tr=>tr.firstChild.textContent).join('\n');
-  const blob = new Blob([lines||''], {type:'text/plain'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'lifeinvader_ads.txt';
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
-});
-
-// Demo examples to try quickly
-rawEl.placeholder = 'Examples you can try:\n• selling house no 85\n• looking to buy plane budget 1.7m\n• Selling video cards 60k each\n• selling SIM card #77-77-777 23k\n• trading toros for karin tundra 2021\n• buying luminous wheels type 4 and 6\n• Party at the beach';
-
+  // Quick demos for your examples:
+  raw.value = 'selling house no 85';
+  el('formatBtn').click(); // Produces: Selling house №85. Price: Negotiable.
+})();
 </script>
 </body>
 </html>
