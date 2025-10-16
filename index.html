@@ -3,49 +3,38 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Lifeinvader Ads — EN-03 (Auto Detect)</title>
+  <title>Lifeinvader Ads — EN-03 (Auto Detect + Manual Fix)</title>
 
-  <!-- Bootstrap 5 CSS (reliable CDN) -->
+  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
         crossorigin="anonymous">
 
-  <!-- Google Material Icons (optional, page still looks fine without) -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
-
   <style>
     :root{ --ok:#10b981; --warn:#d97706; --bad:#e11d48; }
     body{ background:#f3f5f9; }
-    .header {
-      min-height: 28vh;
-      background: url('https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
-      position: relative;
+    .header{
+      min-height:28vh;
+      background:#0b1220 url('https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
+      position:relative;
     }
-    .header::after{
-      content:""; position:absolute; inset:0; background:linear-gradient(135deg,#5b7cfa88,#111827aa);
-    }
-    .header .container{ position:relative; z-index:2; }
-    .app-card{
-      margin-top:-80px; background:#fff; border-radius:1rem; box-shadow:0 20px 40px rgba(2,6,23,.12);
-    }
-    .chip{display:inline-block;padding:.25rem .55rem;border-radius:999px;background:#eef2ff;margin:.125rem;font-size:.8rem}
+    .header::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#5b7cfa88,#111827aa)}
+    .header .container{position:relative;z-index:2}
+    .app-card{margin-top:-80px;background:#fff;border-radius:1rem;box-shadow:0 20px 40px rgba(2,6,23,.12)}
+    .policy-box{border-left:4px solid #3b82f6;background:#eff6ff;padding:.6rem .8rem;border-radius:.5rem}
+    .chip{display:inline-block;padding:.25rem .55rem;border-radius:999px;background:#eef2ff;margin:.125rem;font-size:.85rem}
     .chip.ok{background:rgba(16,185,129,.12);color:var(--ok)}
-    .chip.warn{background:rgba(217,119,6,.12);color:var(--warn)}
     .chip.bad{background:rgba(225,29,72,.12);color:var(--bad)}
+    .error-box{border-left:4px solid var(--bad);background:rgba(225,29,72,.08);padding:.55rem .75rem;border-radius:.5rem}
     .note{color:#6b7280;font-size:.92rem}
-    .error-box{border-left:4px solid var(--bad); background:rgba(225,29,72,.08); padding:.5rem .75rem; border-radius:.5rem}
-    .policy-box{border-left:4px solid #3b82f6; background:#eff6ff; padding:.6rem .8rem; border-radius:.5rem}
-    .icon{font-family:'Material Icons Round'; font-size:1.2rem; vertical-align:-.2rem; margin-right:.25rem}
-    /* Dark/Light toggle */
-    .theme-toggle{ position:fixed; right:16px; bottom:16px; z-index:999; }
     @media (prefers-color-scheme: dark){
       body{ background:#0b1220; color:#e5e7eb; }
       .app-card{ background:#0f172a; }
-      .form-control, .form-select{ background:#111827; color:#e5e7eb; border-color:#253057; }
+      .form-control,.form-select{ background:#0f172a; color:#e5e7eb; border-color:#374151; }
       .form-control::placeholder{ color:#9aa4b2; }
-      .policy-box{ background:rgba(59,130,246,.12); }
-      .error-box{ background:rgba(225,29,72,.12); }
+      .policy-box{background:rgba(59,130,246,.12)}
+      .error-box{background:rgba(225,29,72,.12)}
     }
   </style>
 </head>
@@ -55,32 +44,35 @@
   <section class="header d-flex align-items-center text-center text-white">
     <div class="container py-5">
       <h1 class="fw-bold">Lifeinvader Ads — EN-03</h1>
-      <p class="lead mb-0">Policy-accurate ad builder with <b>Auto-Detect</b></p>
+      <p class="lead mb-0">Policy-accurate ad builder with Auto-Detect + Manual Fix</p>
     </div>
   </section>
 
-  <!-- Card -->
   <div class="container">
     <div class="app-card p-4 p-md-5">
+
       <div class="policy-box mb-3 small">
-        Paste <b>any raw ad</b>. It auto-detects <b>category</b>, <b>action</b>, and <b>money label</b>; fixes money formats;
-        applies Real Estate / Auto / Business / Dating / Work rules; blocks blacklisted content; and outputs a
-        <b>policy-perfect</b> ad (№, feature order, upgrades order, etc.).
+        Paste any raw ad. The parser auto-detects <b>category</b>, <b>action</b>, and <b>money label</b>;
+        fixes money formats (dot-thousands, <code>k/m</code> shorthands); applies Real Estate / Auto / Business /
+        Dating / Work rules (№ numbering, feature order, apartments not insured, vehicle upgrades order, Beach Market rule,
+        license plate length 3–7, blacklist). Includes <b>level→quality</b> mapping:
+        <i>level 1→low, 2→medium, 3→high, 4→max quality</i>.
       </div>
 
       <!-- Auto-Detect -->
       <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-white">
-          <h5 class="mb-0"><span class="icon">bolt</span>Auto-Detect (Raw Ad)</h5>
+          <h5 class="mb-0">⚡ Auto-Detect (Raw Ad)</h5>
         </div>
         <div class="card-body">
           <label for="rawInput" class="form-label">Raw ad text</label>
           <textarea id="rawInput" class="form-control" rows="4"
-            placeholder='e.g., selling house no 85 with garden. price negotiable OR "looking to buy ruby price negotiable" OR selling Ubermacht M5 (E34) full config + insurance 8m'></textarea>
+            placeholder='e.g., selling house no 85 with garden. price negotiable OR buying ruby 20k OR selling level 4 engine'></textarea>
           <div class="note mt-2">
-            Examples it fixes: <b>selling house no 85</b> → <i>Selling house №85. Price: Negotiable.</i> •
-            <b>buyyingng a Ruby. Price: Negotiable.</b> → <i>Buying a ruby. Budget: Negotiable.</i> •
-            <b>looking to purchase car</b> → <i>Buying a car. Budget: Negotiable.</i>
+            Examples fixed: <b>selling house no 85</b> → <i>Selling house №85. Price: Negotiable.</i> •
+            <b>buyyingng a Ruby</b> → <i>Buying a ruby. Budget: Negotiable.</i> •
+            <b>selling level 4 engine</b> → <i>Selling max quality engine. Price: Negotiable.</i> •
+            <b>price 20k</b> → <i>Price: $20.000.</i>
           </div>
           <div class="d-flex gap-2 mt-3">
             <button class="btn btn-primary" onclick="generateFromRaw()">Generate</button>
@@ -99,18 +91,66 @@
       <div id="checks" class="mb-2"></div>
       <div id="errors" class="mb-2"></div>
 
+      <!-- Manual Fix (optional) -->
+      <div class="accordion my-3" id="manualFix">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="mf-head">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mf-body">
+              Manual Fix (optional)
+            </button>
+          </h2>
+          <div id="mf-body" class="accordion-collapse collapse" data-bs-parent="#manualFix">
+            <div class="accordion-body">
+              <div class="row g-3">
+                <div class="col-12 col-md-4">
+                  <label class="form-label">Opener</label>
+                  <select id="mf-opener" class="form-select">
+                    <option value="auto">Auto (detected)</option>
+                    <option value="selling">Selling</option>
+                    <option value="buying">Buying</option>
+                    <option value="trading">Trading</option>
+                    <option value="sot">Selling or trading</option>
+                    <option value="renting">Renting out</option>
+                    <option value="looking">Looking for</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-8">
+                  <label class="form-label">Subject (edit main sentence)</label>
+                  <input id="mf-subject" class="form-control" placeholder='e.g., house №85 with a garden, 5 g.s. and insurance'>
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label">Money label</label>
+                  <select id="mf-money-label" class="form-select">
+                    <option value="auto">Auto (detected)</option>
+                    <option value="price">Price</option>
+                    <option value="budget">Budget</option>
+                    <option value="rent">Rent</option>
+                    <option value="none">None</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-5">
+                  <label class="form-label">Amount</label>
+                  <input id="mf-amount" class="form-control" placeholder='e.g., 20k, 1.7k each, 5m, Negotiable'>
+                  <div class="form-text">k/m shorthands supported: 20k → $20.000, 1.5k → $1.500, 50m → $50 Million.</div>
+                </div>
+                <div class="col-12 col-md-3 d-grid">
+                  <label class="form-label">&nbsp;</label>
+                  <button class="btn btn-secondary" onclick="applyManualFix()">Apply</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <hr class="my-4">
       <div class="small text-muted">
-        Designed to match EN-03 rules: opener words, Price/Budget/Rent, dot-thousands, № for numbers, Real Estate feature order,
+        Built for EN-03 policy accuracy — opener words, Price/Budget/Rent, dot-thousands, № for numbers, Real Estate feature order,
         apartments not insured, vehicles quoted with upgrade order (configuration → visual upgrades → luminous wheels → insurance → turbo kit → drift kit),
-        Beach Market rule (no “Negotiable” line), license plate length 3–7, blacklist, etc.
+        Beach Market rule (no “Negotiable” line), license plate length 3–7, blacklist, and level→quality mapping.
       </div>
-    </div>
-  </div>
 
-  <!-- Theme toggle (system default; users can flip) -->
-  <div class="theme-toggle">
-    <button id="themeBtn" class="btn btn-dark rounded-pill px-3 py-2">🌙 / ☀️</button>
+    </div>
   </div>
 
   <!-- Bootstrap JS -->
@@ -119,14 +159,7 @@
           crossorigin="anonymous"></script>
 
   <script>
-    // ===== Tiny theme toggle (adds/removes a 'light' class) =====
-    const themeBtn = document.getElementById('themeBtn');
-    themeBtn.addEventListener('click', () => {
-      document.documentElement.toggleAttribute('data-theme-light');
-      document.body.classList.toggle('bg-white');
-    });
-
-    // ===== Helpers & constants (same logic as before, trimmed for brevity but policy-accurate) =====
+    // ===== Helpers =====
     const $ = id => document.getElementById(id);
     const lc = s => (s||'').toLowerCase();
     const tcFirst = s => s ? s[0].toUpperCase() + s.slice(1) : s;
@@ -153,22 +186,28 @@
     function normalizeMoney(str){
       if (!str) return '';
       let t = ' ' + String(str).trim() + ' ';
+      // 1) Handle k/m shorthand (e.g., 20k, 1.5k, 50m)
       t = t.replace(/\$?\s*([\d.,]+)\s*([kKmM])\b/g, (_, num, suf) => {
         const val = parseFloat(String(num).replace(/,/g,'.'));
         if (!isFinite(val)) return `$${num}`;
         if (suf.toLowerCase()==='k') return `$${dotThousands(Math.round(val*1000))}`;
-        return `$${val % 1 === 0 ? val.toFixed(0) : String(val)} Million`;
+        const n = (val % 1 === 0) ? val.toFixed(0) : String(val);
+        return `$${n} Million`;
       });
+      // 2) Convert raw numbers to $X (no Million suffix)
       t = t.replace(/\$?\s*(\d{1,3}(?:[,.]\d{3})+|\d+)(?!\s*Million)\b/g, (_, num) => {
         const clean = String(num).replace(/,/g,'');
         if (!/^\d+(\.\d+)?$/.test(clean)) return `$${num}`;
         return `$${dotThousands(clean)}`;
       });
+      // 3) Normalize words
       t = t.replace(/\bnegotiable\b/ig,'Negotiable').replace(/\beach\b/ig,'each');
       return t.trim();
     }
+
     function addEndPeriod(s){
       s = s.trim();
+      // If ends with number (not "... Million"), do not add period
       if (/\d$/.test(s) && !/\bMillion\.$/i.test(s)) return s;
       if (!s.endsWith('.')) s += '.';
       return s;
@@ -200,6 +239,10 @@
       $('chips').innerHTML='';
       $('checks').innerHTML='';
       $('errors').innerHTML='';
+      $('mf-opener').value='auto';
+      $('mf-subject').value='';
+      $('mf-money-label').value='auto';
+      $('mf-amount').value='';
     }
     function chip(label, cls=''){ return `<span class="chip ${cls}">${label}</span>`; }
     function showChips({category, action, moneyLabel}){
@@ -224,7 +267,7 @@
       arr.forEach(e => box.insertAdjacentHTML('beforeend', `<div class="error-box mb-2">${e}</div>`));
     }
 
-    // ===== Auto detection =====
+    // ===== Detection =====
     function detectAction(raw){
       let s=lc(raw);
       if (/\brenting\s+out\b|\brent(?:ing)?\b/.test(s)) return 'Renting out';
@@ -253,7 +296,7 @@
       return 'Other';
     }
 
-    // ===== Builders (same rules as before) =====
+    // ===== Builders =====
     function buildReal(opener, s){
       const errors=[];
       let numMatch = s.match(/\b(?:no\.?|number|num|#|№)\s*([0-9]{1,6})\b/i) || s.match(/\b(house|apartment|penthouse|mansion)\s*(?:no\.?|number|num|#|№)?\s*([0-9]{1,6})\b/i);
@@ -282,7 +325,6 @@
         const tail = feats.length===1 ? feats[0] : feats.slice(0,-1).join(', ') + ' and ' + feats.slice(-1);
         subject += ` with ${tail}`;
       }
-
       let locMatch = s.match(/\b(in|near)\s+([A-Za-z][A-Za-z ]+[A-Za-z])\b/);
       if (locMatch){ subject += ` ${locMatch[1]} ${locMatch[2]}`; }
       subject = subject.replace(/\bCasino apartment\b/ig,'Casino penthouse');
@@ -295,8 +337,7 @@
         if (!amtRaw || /negotiable/i.test(amtRaw)) mline = `${label}: Negotiable.`;
         else {
           const norm = normalizeMoney(amtRaw);
-          const endNum = /\d$/.test(norm) && !/\bMillion\b/.test(norm);
-          mline = `${label}: ${norm}${endNum?'':'.'}`;
+          mline = `${label}: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
         }
       }
       if ((opener==='Trading' || opener==='Selling or trading') && /\b(house|apartment|penthouse|mansion)\b/i.test(subject)) {
@@ -314,7 +355,7 @@
       }
       const bits=[];
       if (/\b(full\s*config|max\s*config|fully\s*upgraded)\b/i.test(s)) bits.push('with full configuration');
-      else if (/\b(partial|nearly max|lvl ?[1-3])\b/i.test(s)) bits.push('with partial configuration');
+      else if (/\b(partial|nearly max|lvl ?[1-3]|level ?[1-3])\b/i.test(s)) bits.push('with partial configuration');
       if (/\bvisual\b|\bbody kit\b|\bbody upgrades\b/i.test(s)) bits.push('visual upgrades');
       if (/\bluminous (rims|wheels)|unique wheels/i.test(s)) bits.push('luminous wheels');
       if (/\binsurance\b/i.test(s)) bits.push('insurance');
@@ -335,13 +376,11 @@
         if (!amtRaw || /negotiable/i.test(amtRaw)) mline = `${label}: Negotiable.`;
         else {
           const norm = normalizeMoney(amtRaw);
-          const endNum = /\d$/.test(norm) && !/\bMillion\b/.test(norm);
-          mline = `${label}: ${norm}${endNum?'':'.'}`;
+          mline = `${label}: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
         }
       } else if (amtRaw){
         const norm = normalizeMoney(amtRaw);
-        const endNum = /\d$/.test(norm) && !/\bMillion\b/.test(norm);
-        mline = `Price: ${norm}${endNum?'':'.'}`;
+        mline = `Price: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
       }
       return { text: `${opener} ${subject}${mline?' '+mline:''}`, errors };
     }
@@ -361,8 +400,7 @@
         let norm = normalizeMoney(amtRaw);
         const over = /\$?(\d+)\s*Million/i.exec(norm);
         if (over && Number(over[1])>300) norm = 'Negotiable';
-        const endNum = /\d$/.test(norm) && !/\bMillion\b/.test(norm);
-        mline = `${label}: ${norm}${endNum?'':'.'}`;
+        mline = `${label}: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
       }
       return { text: `${opener} ${subj} ${mline}`.trim(), errors };
     }
@@ -419,56 +457,52 @@
         if (!amtRaw || /negotiable/i.test(amtRaw)) mline = `${label}: Negotiable.`;
         else {
           const norm = normalizeMoney(amtRaw);
-          const endNum = /\d$/.test(norm) && !/\bMillion\b/.test(norm);
-          mline = `${label}: ${norm}${endNum?'':'.'}`;
+          mline = `${label}: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
         }
       } else if (amtRaw){
         const norm = normalizeMoney(amtRaw);
-        const endNum = /\d$/.test(norm) && !/\bMillion\b/.test(norm);
-        mline = `Price: ${norm}${endNum?'':'.'}`;
+        mline = `Price: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
       }
       if (isBeachMarket && /Negotiable\.$/i.test(mline)) mline = '';
       return { text: `${subject}${mline? ' '+mline:''}`, errors };
     }
 
-    // ===== Raw entry point =====
-    function detectCategory(raw){
-      const s = lc(raw);
-      if (/\b(house|apartment|penthouse|mansion)\b/.test(s)) return 'Real Estate';
-      if (/\b(g\.s\.|w\.h\.|helipad|custom interior)\b/.test(s)) return 'Real Estate';
-      if (/\bdrift kit|turbo kit|visual upgrades|luminous wheels|with full configuration|with partial configuration\b/.test(s)) return 'Auto';
-      if (/\"[^"]+\"/.test(raw)) return 'Auto';
-      for (const b of BUSINESS_LIST){ if (s.includes(lc(b))) return 'Business'; }
-      if (/^looking\s+for\b/.test(s) && /\b(boyfriend|girlfriend|wife|husband|valentine|friends?|family|casino poker players)\b/.test(s)) return 'Dating';
-      if (/\bhiring\b|\blooking\s+for\s+work\b|\bsalary\b|\bconstruction site №\d\b/.test(s)) return 'Work';
-      return 'Other';
-    }
-
+    // ===== Main Raw Parser =====
     function generateFromRaw(){
-      const raw = ($('rawInput').value||'').trim();
+      let raw = ($('rawInput').value||'').trim();
       $('finalOutput').value=''; $('chips').innerHTML=''; $('checks').innerHTML=''; $('errors').innerHTML='';
       if (!raw) return;
 
       const bad = containsBlacklist(raw);
       if (bad){ setErrors([`Rejected: contains blacklisted term: ${bad}`]); return; }
 
-      const action = detectAction(raw);
-      const category = detectCategory(raw);
-      const moneyLabel = moneyLabelFor(action);
-      let out='', errs=[];
-      const s = raw
+      // --- Policy term normalizations BEFORE detection ---
+      // "looking to buy/purchase" → Buying; typos; №
+      raw = raw
         .replace(/looking to buy|looking to purchase/ig,'Buying')
         .replace(/\bbuyyingng\b/ig,'Buying')
         .replace(/\bno\.\b/ig,'№')
         .replace(/\bhouse\s*(?:number|num|#)\s*/ig,'house №')
         .replace(/\bapartment\s*(?:number|num|#)\s*/ig,'apartment №');
 
-      if (category==='Real Estate'){ ({text:out, errors:errs}=buildReal(action, s)); }
-      else if (category==='Auto'){ ({text:out, errors:errs}=buildAuto(action, s)); }
-      else if (category==='Business'){ ({text:out, errors:errs}=buildBusiness(action, s)); }
-      else if (category==='Dating'){ ({text:out, errors:errs}=buildDating(s)); }
-      else if (category==='Work'){ ({text:out, errors:errs}=buildWork(s)); }
-      else { ({text:out, errors:errs}=buildOther(action, s)); }
+      // **Level → quality mapping** (1→low, 2→medium, 3→high, 4→max) for parts/inventories/etc.
+      raw = raw
+        .replace(/\b(level|lvl)\s*1\b/ig,'low quality')
+        .replace(/\b(level|lvl)\s*2\b/ig,'medium quality')
+        .replace(/\b(level|lvl)\s*3\b/ig,'high quality')
+        .replace(/\b(level|lvl)\s*4\b/ig,'max quality');
+
+      const action = detectAction(raw);
+      const category = detectCategory(raw);
+      const moneyLabel = moneyLabelFor(action);
+
+      let out='', errs=[];
+      if (category==='Real Estate'){ ({text:out, errors:errs}=buildReal(action, raw)); }
+      else if (category==='Auto'){ ({text:out, errors:errs}=buildAuto(action, raw)); }
+      else if (category==='Business'){ ({text:out, errors:errs}=buildBusiness(action, raw)); }
+      else if (category==='Dating'){ ({text:out, errors:errs}=buildDating(raw)); }
+      else if (category==='Work'){ ({text:out, errors:errs}=buildWork(raw)); }
+      else { ({text:out, errors:errs}=buildOther(action, raw)); }
 
       out = out.replace(/\bhouse\s+no\s+(\d+)/ig,'house №$1')
                .replace(/\bapartment\s+no\s+(\d+)/ig,'apartment №$1')
@@ -477,7 +511,7 @@
 
       out = out.replace(/\b(Price|Budget|Rent):\s*([^.\n]+)(?!\.)/g, (_,L,val)=>{
         const norm=normalizeMoney(val);
-        return `${L}: ${norm}${/\d$/.test(norm)&&!/\bMillion\b/.test(norm)?'':'.'}`;
+        return `${L}: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
       });
 
       out = tcFirst(fixPlaces(out));
@@ -487,7 +521,65 @@
       showChips({category, action, moneyLabel});
       setChecks(out, action);
       setErrors(errs);
+
+      // Prefill Manual Fix panel
+      $('mf-opener').value='auto';
+      $('mf-subject').value = out.replace(/^(Buying|Selling|Trading|Selling or trading|Renting out|Looking for)\s+/,'').replace(/\s+(Price|Budget|Rent):.*$/,'').trim();
+      $('mf-money-label').value = (out.match(/\b(Price|Budget|Rent):/i)||[])[1]?.toLowerCase() || 'none';
+      $('mf-amount').value = (out.match(/\b(Price|Budget|Rent):\s*([^\.\n]+)/i)||[])[2] || '';
     }
+
+    // ===== Manual Fix panel =====
+    function applyManualFix(){
+      const openerSel = $('mf-opener').value;
+      const subject = $('mf-subject').value.trim();
+      const labelSel  = $('mf-money-label').value;
+      let amount = $('mf-amount').value.trim();
+
+      if (!subject){
+        $('errors').innerHTML = '<div class="error-box mb-2">Manual Fix: Subject cannot be empty.</div>';
+        return;
+      }
+
+      // opener
+      let opener = openerSel==='auto'
+        ? ( ($('finalOutput').value.match(/^(Buying|Selling|Trading|Selling or trading|Renting out|Looking for)/)||[])[1] || 'Selling' )
+        : ({
+            selling:'Selling',
+            buying:'Buying',
+            trading:'Trading',
+            sot:'Selling or trading',
+            renting:'Renting out',
+            looking:'Looking for'
+          }[openerSel]);
+
+      // money label
+      let label = labelSel==='auto'
+        ? ( ($('finalOutput').value.match(/\b(Price|Budget|Rent):/i)||[])[1] || '' )
+        : (labelSel==='none' ? '' : ({price:'Price',budget:'Budget',rent:'Rent'}[labelSel]));
+
+      // amount
+      if (label){
+        amount = amount ? normalizeMoney(amount) : 'Negotiable';
+      } else {
+        amount = '';
+      }
+
+      // rebuild
+      let out = `${opener} ${tcFirst(subject)}`;
+      if (!/[.\d]$/.test(out)) out = addEndPeriod(out);
+      if (label){
+        out += ' ' + `${label}: ${amount}${/\bMillion$/.test(amount) ? '.' : (/\d$/.test(amount)? '' : '.')}`;
+      }
+      out = tcFirst(fixPlaces(out));
+      $('finalOutput').value = out;
+    }
+
+    // Expose to buttons
+    window.generateFromRaw = generateFromRaw;
+    window.clearRaw = clearRaw;
+    window.copyText = copyText;
+    window.applyManualFix = applyManualFix;
   </script>
 </body>
 </html>
