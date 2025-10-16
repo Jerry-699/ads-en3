@@ -1,621 +1,555 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Lifeinvader Ads — EN-03 (Auto Detect + Manual Fix + Learning)</title>
-
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-        crossorigin="anonymous">
-
-  <style>
-    :root{ --ok:#10b981; --warn:#d97706; --bad:#e11d48; }
-    body{ background:#0b1220; color:#e5e7eb; }
-    .header{
-      min-height:28vh;
-      background:#0b1220 url('https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
-      position:relative;
-    }
-    .header::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#5b7cfa88,#111827aa)}
-    .header .container{position:relative;z-index:2}
-    .app-card{margin-top:-80px;background:#0f172a;border-radius:1rem;box-shadow:0 20px 40px rgba(2,6,23,.35)}
-    .policy-box{border-left:4px solid #60a5fa;background:#0b1b36;padding:.6rem .8rem;border-radius:.5rem}
-    .chip{display:inline-block;padding:.25rem .55rem;border-radius:999px;background:#111827;margin:.125rem;font-size:.85rem;border:1px solid #1f2937}
-    .chip.ok{background:rgba(16,185,129,.12);color:var(--ok);border-color:rgba(16,185,129,.35)}
-    .chip.bad{background:rgba(225,29,72,.12);color:var(--bad);border-color:rgba(225,29,72,.35)}
-    .error-box{border-left:4px solid var(--bad);background:rgba(225,29,72,.12);padding:.55rem .75rem;border-radius:.5rem}
-    .note{color:#9aa4b2;font-size:.92rem}
-    .form-control,.form-select{ background:#0b1220; color:#e5e7eb; border-color:#334155; }
-    .form-control::placeholder{ color:#9aa4b2; }
-    .btn-outline-secondary{color:#e5e7eb;border-color:#334155}
-    .btn-outline-secondary:hover{background:#1f2937}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lifeinvader Ads — EN-03 (Auto-Detect + Manual Fix)</title>
+<style>
+  :root{
+    --bg:#0e1320; --card:#151b2d; --text:#e8eefc; --muted:#9fb0d3; --accent:#6aa0ff; --ok:#22c55e; --warn:#ffb020; --bad:#ef4444; --chip:#202945;
+    --shadow: 0 10px 30px rgba(10,14,25,.4);
+  }
+  html.light{
+    --bg:#f4f6fb; --card:#ffffff; --text:#0f172a; --muted:#64748b; --accent:#2563eb; --ok:#16a34a; --warn:#b7791f; --bad:#dc2626; --chip:#eef2ff;
+    --shadow: 0 10px 24px rgba(2,6,23,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:500 16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+  header{padding:28px 18px 8px;display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:0;background:linear-gradient(180deg,var(--bg) 80%,transparent);z-index:10}
+  .brand{font-weight:900;font-size:26px;letter-spacing:.3px}
+  .hint{color:var(--muted);font-size:13px}
+  .wrap{max-width:1100px;margin:0 auto;padding:16px}
+  .card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:16px 16px}
+  textarea,input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid transparent;background:var(--chip);color:var(--text);outline:none}
+  textarea{min-height:140px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .btn{all:unset;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+  .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+  .btn.warn{background:var(--warn);color:#111}
+  .btn.bad{background:var(--bad)}
+  .btn.ok{background:var(--ok)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:var(--chip);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px}
+  .out{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;padding:12px 14px;border-radius:10px;background:#0a0f1a22;border:1px dashed #7aa2ff55}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .badge{padding:3px 8px;border-radius:999px;font-size:12px;background:#1f2937;color:#cbd5e1}
+  .badge.ok{background:#052e1a;color:#a7f3d0}
+  .badge.warn{background:#3a2300;color:#fde68a}
+  .badge.bad{background:#3f0b0b;color:#fecaca}
+  .sectionTitle{font-weight:800;margin:8px 0 4px}
+  .muted{color:var(--muted)}
+  .toggle{display:inline-flex;gap:8px;align-items:center;cursor:pointer;user-select:none}
+  .switch{inline-size:46px;block-size:26px;background:#334155;border-radius:999px;position:relative}
+  .knob{position:absolute;inset:3px;inline-size:20px;block-size:20px;background:#fff;border-radius:50%;transition:transform .2s}
+  html.light .knob{transform:translateX(20px)}
+  .footer{opacity:.7;margin:30px 0 60px;text-align:center;font-size:13px}
+  @media (max-width:860px){
+    .row,.row3{grid-template-columns:1fr}
+  }
+</style>
 </head>
 <body>
+<header class="wrap">
+  <div>
+    <div class="brand">Lifeinvader Ads — EN-03</div>
+    <div class="hint">Policy-accurate ad builder with <b>Auto-Detect</b> raw-ad parser + Manual Fix & Learning.</div>
+  </div>
+  <label class="toggle">
+    <span class="hint">Day / Night</span>
+    <span class="switch"><span class="knob"></span></span>
+  </label>
+</header>
 
-  <!-- Header -->
-  <section class="header d-flex align-items-center text-center text-white">
-    <div class="container py-5">
-      <h1 class="fw-bold">Lifeinvader Ads — EN-03</h1>
-      <p class="lead mb-0">Policy-accurate ad builder with Auto-Detect, Manual Fix, and Learning</p>
+<main class="wrap">
+  <!-- RAW AD -->
+  <section class="card" id="rawCard">
+    <div class="sectionTitle">⚡ Auto-Detect (Raw Ad) + Manual Fix</div>
+    <div class="hint" style="margin-bottom:8px">
+      Paste any raw text. The parser auto-detects <b>category</b>, <b>action</b>, and <b>money label</b>, fixes money formats (<i>20k → $20.000</i>, <i>1.5m → $1.5 Million</i>), maps <i>level 1–4</i> → <i>low/medium/high/max quality</i>,
+      applies Real Estate / Auto feature order, blocks blacklisted terms, and outputs a policy-perfect ad.
+    </div>
+    <textarea id="raw" placeholder="e.g., selling house no 85 garden 5 gs insurance • buyyingng a Ruby • Renting out house 1023 rent 100k / week • selling level 4 engine • price 20k …"></textarea>
+
+    <div class="toolbar" style="margin-top:10px">
+      <button class="btn" id="generateBtn">Generate</button>
+      <button class="btn ghost" id="clearBtn">Clear</button>
+      <span class="hint">k/m shorthands: <b>20k → $20.000</b>, <b>1.5k → $1.500</b>, <b>50m → $50 Million</b>.</span>
+    </div>
+
+    <!-- OUTPUT -->
+    <div style="margin-top:16px">
+      <div class="sectionTitle">Formatted Output</div>
+      <div class="row">
+        <input id="output" class="out" readonly placeholder="Your formatted ad will appear here…" />
+        <div class="toolbar" style="align-items:center">
+          <button class="btn ok" id="copyBtn">Copy</button>
+          <span id="detectChips" class="chips"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANUAL FIX (AUTO-FILLED) -->
+    <div class="sectionTitle" style="margin-top:18px">Manual Fix (optional)</div>
+    <div class="row3">
+      <div>
+        <div class="muted">Opener</div>
+        <select id="mfOpener">
+          <option>Auto (detected)</option>
+          <option>Buying</option>
+          <option>Selling</option>
+          <option>Trading</option>
+          <option>Selling or trading</option>
+          <option>Renting out</option>
+          <option>Renting</option>
+          <option>Looking for</option>
+        </select>
+      </div>
+      <div>
+        <div class="muted">Subject (edit main sentence)</div>
+        <input id="mfSubject" placeholder='e.g., house №85 with a garden, 5 g.s. and insurance' />
+      </div>
+      <div>
+        <div class="muted">Amount</div>
+        <input id="mfAmount" placeholder='e.g., 20k, 1.7k each, 5m, Negotiable' />
+      </div>
+    </div>
+    <div class="row3" style="margin-top:10px">
+      <div>
+        <div class="muted">Money label</div>
+        <select id="mfLabel">
+          <option>Auto (detected)</option>
+          <option>Price:</option>
+          <option>Budget:</option>
+          <option>Rent:</option>
+        </select>
+      </div>
+      <div>
+        <div class="muted">Detected category (read-only)</div>
+        <input id="mfCat" readonly placeholder="Auto / Real Estate / Business / Dating / Work / Other" />
+      </div>
+      <div style="display:flex;gap:10px;align-items:end">
+        <button class="btn" id="applyBtn">Apply</button>
+        <button class="btn ok" id="applySaveBtn">Apply & Save</button>
+      </div>
+    </div>
+
+    <!-- LEARNING -->
+    <div class="card" style="margin-top:14px;background:transparent;border:1px dashed #6aa0ff55">
+      <div class="row">
+        <div class="muted">Learning rules</div>
+        <label class="toggle" style="justify-self:end">
+          <span class="hint">Auto-apply rules</span>
+          <span class="switch"><span class="knob"></span></span>
+          <input id="autoApply" type="checkbox" hidden>
+        </label>
+      </div>
+      <div id="ruleInfo" class="hint">No rules saved yet.</div>
     </div>
   </section>
 
-  <div class="container">
-    <div class="app-card p-4 p-md-5">
+  <p class="footer">Built for EN-03 policy accuracy — opener words; Price/Budget/Rent; dot-thousands; № for numbers; Real Estate feature order; vehicles quoted with upgrade order (configuration → visual upgrades → luminous wheels → insurance → turbo kit → drift kit); blacklist; level→quality mapping.</p>
+</main>
 
-      <div class="policy-box mb-3 small">
-        Paste any raw ad. The parser auto-detects <b>category</b>, <b>action</b>, and <b>money label</b>; fixes money formats
-        (<code>k/m</code> shorthands → dot-thousands), enforces Real Estate / Auto / Business / Dating / Work rules
-        (№ numbering, feature order, apartments not insured, vehicle upgrades order, Beach Market rule, license plate length 3–7, blacklist).
-        Includes <b>level → quality</b> mapping: 1→low, 2→medium, 3→high, 4→max quality.
-      </div>
+<script>
+/* --------------------------- Helpers & Data --------------------------- */
+const el = id => document.getElementById(id);
+const $ = {
+  raw: el('raw'), out: el('output'), chips: el('detectChips'),
+  gen: el('generateBtn'), clear: el('clearBtn'), copy: el('copyBtn'),
+  mfOpen: el('mfOpener'), mfSub: el('mfSubject'), mfAmt: el('mfAmount'),
+  mfLabel: el('mfLabel'), mfCat: el('mfCat'),
+  apply: el('applyBtn'), applySave: el('applySaveBtn'),
+  autoApply: el('autoApply'), ruleInfo: el('ruleInfo')
+};
 
-      <!-- Auto-Detect + Manual Fix in one card -->
-      <div class="card border-0 shadow-sm mb-4" style="background:#0b1220">
-        <div class="card-header" style="background:#0b1220;border-bottom:1px solid #1f2937">
-          <h5 class="mb-0 text-white">⚡ Auto-Detect (Raw Ad) + Manual Fix</h5>
-        </div>
-        <div class="card-body">
-          <label for="rawInput" class="form-label">Raw ad text</label>
-          <textarea id="rawInput" class="form-control" rows="4"
-            placeholder='e.g., selling house no 85 with garden. price negotiable OR buying ruby 20k OR selling level 4 engine'></textarea>
-          <div class="note mt-2">
-            Examples fixed: <b>selling house no 85</b> → <i>Selling house №85. Price: Negotiable.</i> •
-            <b>buyyingng a Ruby</b> → <i>Buying a ruby. Budget: Negotiable.</i> •
-            <b>selling level 4 engine</b> → <i>Selling max quality engine. Price: Negotiable.</i> •
-            <b>budget 20k</b> → <i>Budget: $20.000.</i>
-          </div>
-          <div class="d-flex gap-2 mt-3">
-            <button class="btn btn-primary" onclick="generateFromRaw()">Generate</button>
-            <button class="btn btn-outline-secondary" onclick="clearRaw()">Clear</button>
-          </div>
+const ACTION_WORDS = [
+  'selling or trading','selling or trade','sell or trade',
+  'trading','trade',
+  'renting out','renting','rent out',
+  'buying','looking to buy','looking to purchase','want to buy','wtb',
+  'selling','for sale','wts'
+];
 
-          <!-- Output -->
-          <h6 class="fw-semibold mt-4">Formatted Output</h6>
-          <div class="input-group mb-1">
-            <input id="finalOutput" class="form-control" readonly placeholder="Your formatted ad will appear here…">
-            <button class="btn btn-success" onclick="copyText()">Copy</button>
-          </div>
-          <div id="chips" class="mb-2"></div>
-          <div id="checks" class="mb-2"></div>
-          <div id="errors" class="mb-2"></div>
+const MONEY_LABEL = { Selling:'Price:', Buying:'Budget:', Trading:'Price:', 'Selling or trading':'Price:', 'Renting out':'Rent:', Renting:'Budget:', 'Looking for':'Budget:' };
 
-          <!-- Manual Fix (always visible after Generate) -->
-          <div class="border rounded-3 p-3 mt-3" style="border-color:#1f2937">
-            <h6 class="mb-3">Manual Fix (optional)</h6>
-            <div class="row g-3">
-              <div class="col-12 col-md-4">
-                <label class="form-label">Opener</label>
-                <select id="mf-opener" class="form-select">
-                  <option value="auto">Auto (detected)</option>
-                  <option value="selling">Selling</option>
-                  <option value="buying">Buying</option>
-                  <option value="trading">Trading</option>
-                  <option value="sot">Selling or trading</option>
-                  <option value="renting">Renting out</option>
-                  <option value="looking">Looking for</option>
-                </select>
-              </div>
-              <div class="col-12 col-md-8">
-                <label class="form-label">Subject (edit main sentence)</label>
-                <input id="mf-subject" class="form-control" placeholder='e.g., house №85 with a garden, 5 g.s. and insurance'>
-              </div>
-              <div class="col-12 col-md-4">
-                <label class="form-label">Money label</label>
-                <select id="mf-money-label" class="form-select">
-                  <option value="auto">Auto (detected)</option>
-                  <option value="price">Price</option>
-                  <option value="budget">Budget</option>
-                  <option value="rent">Rent</option>
-                  <option value="none">None</option>
-                </select>
-              </div>
-              <div class="col-12 col-md-5">
-                <label class="form-label">Amount</label>
-                <input id="mf-amount" class="form-control" placeholder='e.g., 20k, 1.7k each, 5m, Negotiable'>
-                <div class="form-text text-secondary">k/m shorthands: 20k → $20.000, 1.5k → $1.500, 50m → $50 Million.</div>
-              </div>
-              <div class="col-12 col-md-3 d-grid">
-                <label class="form-label">&nbsp;</label>
-                <div class="btn-group">
-                  <button class="btn btn-secondary" onclick="applyManualFix(false)">Apply</button>
-                  <button class="btn btn-outline-info" onclick="applyManualFix(true)">Apply &amp; Save</button>
-                </div>
-              </div>
-            </div>
-          </div>
+const OFFICIAL_PLACES = [
+  'Vinewood Hills','Rockford Hills','Richman','Sandy Shores','Paleto Bay','Postal','Hospital','Capitol','Fire Station','Auto Fair',
+  'Bahama Mamas Bar','Tequi-la-la Bar','FIB','Hotel Spa Bar','Pacific Bluffs Country Club','Diamond Resort Bar',
+  'Vanilla Unicorn Bar','Church','Stock Exchange','Stadium','Chumash','Lifeinvader','Del Perro Pier','Del Perro Beach',
+  'Cayo Perico Island','Hotel','Raton Canyon','School','SAHP'
+];
 
-          <!-- Learning rules manager -->
-          <div class="border rounded-3 p-3 mt-3" style="border-color:#1f2937">
-            <div class="d-flex align-items-center justify-content-between">
-              <h6 class="mb-0">Learning rules</h6>
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="lr-enabled" checked>
-                <label class="form-check-label" for="lr-enabled">Auto-apply rules</label>
-              </div>
-            </div>
-            <div class="note mt-1">Your edits can be saved as rules. The app applies them to similar raw ads <i>before</i> parsing.</div>
-            <div id="lr-list" class="mt-3"></div>
-          </div>
+const BUSINESS_LIST = [
+  'Ammunition Store','Bar','Car wash','Chip tuning','Clothing shop','Cowshed','Electric station','Farm','Flower shop','Freight train',
+  'Gas station','Grand Elite','Hair salon','Jewelry store','Oil Well','Parking','Pet Shop','Plantation','Car sharing','State object',
+  'Service station','24/7 Store','Tattoo studio','Taxi company','ATM business','Juice shop','Burger shop','Warehouse','Fight club'
+];
 
-        </div>
-      </div>
+const BLACKLIST = [
+ 'firearm','gun','pistol','rifle','ammunition','bulletproof','armor plate','weed','cannabis','drug','cocaine',
+ 'ems surgical mask','medical mask','covid mask','balaclava','scanner','radar','rope','head bag','usb with virus',
+ 'lock pick','crowbar','troll','animal skin','satellite dish','barricade','anti-radar','engine block','air horn',
+ 'grand coin','premium battlepass','playboy family','nationality','sexual','medkit','pills','tincture soup','gang hq','black market'
+];
 
-      <div class="small text-muted">
-        Built for EN-03 policy accuracy — opener words, Price/Budget/Rent, dot-thousands, № for numbers, Real Estate feature order,
-        apartments not insured, vehicles quoted with upgrade order (configuration → visual upgrades → luminous wheels → insurance → turbo kit → drift kit),
-        Beach Market rule, license plate length 3–7, blacklist, and level→quality mapping.
-      </div>
+const VEHICLE_HINTS = ['car','truck','motorcycle','bike','boat','helicopter','plane','monowheel'];
 
-    </div>
-  </div>
+const QUAL_MAP = {1:'low quality',2:'medium quality',3:'high quality',4:'max quality'};
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-          crossorigin="anonymous"></script>
+/* --------------------------- Theme Toggle --------------------------- */
+(function initTheme(){
+  const apply = mode => document.documentElement.classList.toggle('light', mode==='light');
+  const saved = localStorage.getItem('li-theme') || 'dark';
+  apply(saved);
+  document.querySelector('header .toggle').addEventListener('click', ()=>{
+    const next = document.documentElement.classList.contains('light')?'dark':'light';
+    localStorage.setItem('li-theme', next); apply(next);
+  });
+})();
 
-  <script>
-    /************ Utilities ************/
-    const $ = id => document.getElementById(id);
-    const lc = s => (s||'').toLowerCase();
-    const tcFirst = s => s ? s[0].toUpperCase() + s.slice(1) : s;
-    const dotThousands = n => String(Math.trunc(Math.abs(Number(n)))).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+/* --------------------------- Money Formatting --------------------------- */
+function formatMoneyFromText(txt){
+  if(!txt) return 'Negotiable';
+  const t = String(txt).trim().toLowerCase();
+  if (t==='negotiable' || t==='nego') return 'Negotiable';
 
-    function copyText(){
-      const v = $('finalOutput').value.trim();
-      if (!v) return;
-      navigator.clipboard.writeText(v);
+  // capture things like "20k", "1.7k", "50m", "1.5m", "150000", "$2,000", "2.000"
+  const m = t.match(/(\d+(\.\d+)?)(\s*)(k|m|million|mil)?/i);
+  if(!m) return 'Negotiable';
+  let n = parseFloat(m[1]);
+  const unit = (m[4]||'').toLowerCase();
+
+  // normalize by unit
+  if(unit==='k') n = n*1000;
+  else if(unit==='m' || unit==='million' || unit==='mil') n = n*1000000;
+
+  // >= 1,000,000 -> "$X.Y Million"
+  if(n >= 1000000){
+    const millions = Math.round(n/100000)/10; // one decimal
+    // keep one decimal only when needed
+    const s = (Number.isInteger(millions)? millions.toFixed(0) : millions.toFixed(1));
+    return `$${s} Million`;
+  }
+
+  // thousands with dot separators
+  const thousands = Math.round(n);
+  return '$' + thousands.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+
+/* --------------------------- Detect / Normalize --------------------------- */
+function hasBlacklist(raw){
+  const r = raw.toLowerCase();
+  return BLACKLIST.find(w=> r.includes(w));
+}
+
+function detectAction(raw){
+  const r = raw.toLowerCase();
+  if(/selling\s*or\s*trading|sell(?:ing)?\s*or\s*trade/.test(r)) return 'Selling or trading';
+  if(/\btrading\b|\btrade\b/.test(r)) return 'Trading';
+  if(/\brenting out\b|\brent out\b/.test(r)) return 'Renting out';
+  if(/\brenting\b/.test(r)) return 'Renting';
+  if(/\bbuying\b|\bwtb\b|\blooking to (buy|purchase)\b|\bwant to buy\b/.test(r)) return 'Buying';
+  if(/\bselling\b|\bwts\b|\bfor sale\b/.test(r)) return 'Selling';
+  // fallbacks from intent words
+  if(/\bbudget\b/.test(r)) return 'Buying';
+  if(/\bprice\b/.test(r)) return 'Selling';
+  return 'Selling';
+}
+
+function detectCategory(raw){
+  const r = raw.toLowerCase();
+  // Hard signals
+  if(/\bhouse|apartment|mansion|penthouse|casino apartment|casino penthouse|g\.s\.|w\.h\.|№|no\.?\s*\d+/.test(r)) return 'Real Estate';
+  if(BUSINESS_LIST.some(b=> r.includes(b.toLowerCase())) || /\bbusiness\b|\bstate object\b|\bplantation\b/.test(r)) return 'Business';
+  if(/\blooking for\b/.test(r) && /\b(poker|wife|husband|boyfriend|girlfriend|family|friends|valentine|date)\b/.test(r)) return 'Dating';
+  if(/\bhiring\b|\blooking for work\b|\bjob\b|\bconstruction site\b/.test(r)) return 'Work';
+  if(VEHICLE_HINTS.some(v=> r.includes(v))) return 'Auto';
+  // vehicle names quoted "Brand Model"
+  if(/"[^"]+"\s*(with|at|price|budget|rent|$)/i.test(raw)) return 'Auto';
+  return 'Other';
+}
+
+function normalizeOpenSentence(raw, action, cat){
+  let text = raw.trim();
+
+  // map "looking to buy/purchase" → Buying; assure first word capitalization
+  text = text.replace(/^\s*looking to (buy|purchase)/i,'Buying')
+             .replace(/^\s*buying/i,'Buying')
+             .replace(/^\s*selling or trading/i,'Selling or trading')
+             .replace(/^\s*trading/i,'Trading')
+             .replace(/^\s*selling/i,'Selling')
+             .replace(/^\s*renting out/i,'Renting out')
+             .replace(/^\s*renting/i,'Renting');
+
+  // Level → quality (engine, transmission, suspension, tires, inventory…)
+  text = text.replace(/\blevel\s*(1|2|3|4)\b/gi, (_,d)=> QUAL_MAP[+d]);
+
+  // “no/number” → №
+  text = text.replace(/\b(?:house|apartment|mansion|penthouse|casino apartment)\s*(?:no\.?|number|#)\s*(\d+)/gi,(m)=>{
+    const num = m.match(/(\d+)/)[1];
+    return m.replace(/(house|apartment|mansion|penthouse|casino apartment).*/i, (seg)=>{
+      const name = seg.match(/house|apartment|mansion|penthouse|casino apartment/i)[0];
+      return `${name} №${num}`;
+    });
+  });
+
+  // Casino apartment → Casino penthouse
+  text = text.replace(/casino apartment/gi,'Casino penthouse');
+
+  // tuning/feature word maps
+  text = text.replace(/\b(body upgrades|body kit)\b/gi,'visual upgrades')
+             .replace(/\b(turbo)\b/gi,'turbo kit')
+             .replace(/\b(drift tuning|drift assistance)\b/gi,'drift kit')
+             .replace(/\b(luminous rims|unique wheels)\b/gi,'luminous wheels')
+             .replace(/\b(crates|cases)\b/gi,'containers')
+             .replace(/\b(spray cans|spray balloons)\b/gi,'paint cans')
+             .replace(/\bextras\b/gi,'of type')
+             .replace(/\bscarf\b/gi,'mask');
+
+  // partial/full configuration
+  text = text.replace(/\b(max config|max tuning|fully upgraded)\b/gi,'with full configuration')
+             .replace(/\b(nearly max|partial|lvl\s*3|level 3|level 2|lvl\s*2|level 1|lvl\s*1)\b/gi,'with partial configuration');
+
+  return text;
+}
+
+/* Real Estate features ordering */
+function orderRealEstate(subject){
+  // pick features
+  const feats = [];
+  const got = s=>subject.toLowerCase().includes(s);
+  if(got('garden')) feats.push('a garden');
+  const gs = subject.match(/\b(2|5|9|25)\s*g\.s\.|\b(2|5|9|25)\s*gs\b/i);
+  if(gs){ const v=(gs[0].match(/\d+/)||[''])[0]; feats.push(`${v} g.s.`); }
+  const wh = subject.match(/\b(3|4|5)\s*w\.h\.|\b(3|4|5)\s*wh\b/i);
+  if(wh){ const v=(wh[0].match(/\d+/)||[''])[0]; feats.push(`${v} w.h.`); }
+  if(got('custom interior')) feats.push('custom interior');
+  if(got('insurance')) feats.push('insurance');
+  if(got('helipad')) feats.push('helipad');
+
+  // other nice features
+  ['swimming pool','tennis court','long driveway','large driveway','spacious backyard','backyard'].forEach(k=>{
+    if(got(k)) feats.push(k.replace('large','long').replace('backyard','spacious backyard'));
+  });
+
+  // views
+  const vm = subject.match(/\b(nice|beautiful|great)\s+views?/i);
+  if(vm) feats.push(vm[1] + ' views');
+
+  // Location (capitalize if official)
+  let loc = '';
+  OFFICIAL_PLACES.forEach(p=>{
+    if(subject.toLowerCase().includes(p.toLowerCase())) loc = p;
+  });
+
+  // Build ordered feature string
+  const joined = feats.length
+      ? ' with ' + feats.slice(0,-1).join(', ') + (feats.length>1?', and ':'') + feats.slice(-1) + (loc ? ' in ' + loc : '')
+      : (loc ? ' in ' + loc : '');
+
+  // Ensure “house/apartment …” base
+  let base = subject;
+  if(!/house|apartment|mansion|Casino penthouse/i.test(base)){
+    base = 'a house' + joined;
+  } else {
+    // remove existing unordered features chunk heuristically:
+    base = base.replace(/\swith .*$/i,'') + joined;
+  }
+  return base;
+}
+
+/* Subject extraction */
+function extractSubject(raw, cat){
+  let s = raw;
+
+  // quoted vehicle names stay quoted
+  const quoted = raw.match(/"[^"]+"/);
+  if(quoted) s = quoted[0];
+
+  // houses etc with numbers → “house №85 …”
+  const prop = raw.match(/\b(house|apartment|mansion|casino (?:apartment|penthouse))\b[^.]*?(?:no\.?|number|#)?\s*(\d+)?/i);
+  if(cat==='Real Estate' && prop){
+    let name = prop[1].replace(/casino apartment/i,'Casino penthouse');
+    const num = prop[2];
+    s = num ? `${name} №${num}` : `a ${name}`;
+    // add feature words from raw
+    const plus = [];
+    if(/\bgarden\b/i.test(raw)) plus.push('a garden');
+    if(/\b(2|5|9|25)\s*g\.s?\.?/i.test(raw)) plus.push(RegExp.$1 + ' g.s.');
+    if(/\b(3|4|5)\s*w\.h\.?/i.test(raw)) plus.push(RegExp.$1 + ' w.h.');
+    if(/\bcustom (?:interior|furniture)\b/i.test(raw)) plus.push('custom interior');
+    if(/\binsurance\b/i.test(raw)) plus.push('insurance');
+    if(plus.length) s += ' with ' + plus.join(', ');
+    return orderRealEstate(s);
+  }
+
+  // generic items (e.g., “level 3 pickaxe”)
+  // normalize “level N → quality”
+  s = s.replace(/\blevel\s*(1|2|3|4)\b/gi,(_,d)=> QUAL_MAP[+d]);
+
+  // default to cleaned trimmed words without money words
+  s = s.replace(/\b(price|budget|rent)\b[^.,;]*/gi,'').trim();
+
+  // Capitalize first letter always
+  if(s.length) s = s[0].toUpperCase() + s.slice(1);
+  return s;
+}
+
+/* Amount extraction */
+function detectAmount(raw){
+  const r = raw.toLowerCase();
+
+  // explicit numeric after keywords
+  let m = r.match(/(?:price|budget|rent|bet)\s*[:\-]?\s*\$?\s*([\d.,]+(?:\s*[km]|m|k)?)/i);
+  if(!m) m = r.match(/\$?\s*([\d.,]+(?:\s*[km]|m|k))(?:\s*each)?/i);
+  if(!m) return 'Negotiable';
+
+  const val = m[1].replace(/[, ]/g,'');
+  return formatMoneyFromText(val);
+}
+
+/* End punctuation rule */
+function ensureEndPunctuation(txt){
+  return /\d$/.test(txt) ? txt : (txt.endsWith('.') ? txt : txt + '.');
+}
+
+/* Build the final ad */
+function buildAd({action, cat, subject, amount}){
+  // auto money label
+  let label = MONEY_LABEL[action] || 'Price:';
+  if(amount==='Negotiable') amount = 'Negotiable';
+
+  // Real-Estate “Selling an apartment/house…” rule (“a/an” if no number)
+  if(cat==='Real Estate' && /^(house|apartment|mansion|Casino penthouse)\b/i.test(subject)===false){
+    // add an article when missing
+    if(!subject.startsWith('a ') && !subject.startsWith('an ') && !subject.includes('№')) subject = 'a ' + subject;
+  }
+
+  const base = `${action} ${subject}. ${label} ${amount}`;
+  // remove period when ends with a pure number value (e.g., … $20.000)
+  return /\$\d[\d.]*$| Million$/.test(base) ? base : ensureEndPunctuation(base);
+}
+
+/* --------------------------- Badges --------------------------- */
+function setChips(list){
+  $.chips.innerHTML = '';
+  list.forEach(x=>{
+    const c = document.createElement('span'); c.className='chip'; c.textContent=x; $.chips.appendChild(c);
+  });
+}
+
+/* --------------------------- Learning Rules --------------------------- */
+const RULE_KEY='li_rules_v1';
+function loadRules(){ try{ return JSON.parse(localStorage.getItem(RULE_KEY)||'[]'); }catch{ return [] } }
+function saveRules(r){ localStorage.setItem(RULE_KEY, JSON.stringify(r)); }
+function addRule(raw, patch){
+  const rules = loadRules().filter(x=>x.raw!==raw.toLowerCase().trim());
+  rules.unshift({raw:raw.toLowerCase().trim(), patch});
+  saveRules(rules);
+  updateRuleInfo();
+}
+function findRule(raw){
+  const r = raw.toLowerCase().trim();
+  return loadRules().find(x=> r===x.raw);
+}
+function updateRuleInfo(){
+  const n = loadRules().length;
+  $.ruleInfo.textContent = n ? `${n} rule${n>1?'s':''} saved. These will auto-apply to matching raw ads before parsing.` : 'No rules saved yet.';
+}
+
+/* --------------------------- Main Parse Flow --------------------------- */
+function parseRaw(){
+  const raw = $.raw.value.trim();
+  if(!raw){ $.out.value=''; setChips([]); return; }
+
+  // learning pre-patch
+  if($.autoApply.checked){
+    const rule = findRule(raw);
+    if(rule){
+      if(rule.patch.opener) $.mfOpen.value = rule.patch.opener;
+      if(rule.patch.subject) $.mfSub.value = rule.patch.subject;
+      if(rule.patch.amount) $.mfAmt.value = rule.patch.amount;
+      if(rule.patch.label) $.mfLabel.value = rule.patch.label;
     }
-    function chip(label, cls=''){ return `<span class="chip ${cls}">${label}</span>`; }
-    function setErrors(arr){
-      const box = $('errors'); box.innerHTML = '';
-      arr.forEach(e => box.insertAdjacentHTML('beforeend', `<div class="error-box mb-2">${e}</div>`));
-    }
-    function showChips({category, action, moneyLabel}){
-      $('chips').innerHTML = [
-        chip(`Detected: ${category}`, 'ok'),
-        chip(`Action: ${action}`, 'ok'),
-        moneyLabel ? chip(`Money: ${moneyLabel}`, 'ok') : ''
-      ].join(' ');
-    }
-    function setChecks(txt, opener){
-      const box = $('checks'); box.innerHTML = '';
-      const add = (msg, cls='') => box.insertAdjacentHTML('beforeend', `<span class="chip ${cls}">${msg}</span> `);
-      /^[A-Z]/.test(txt) ? add('Capitalization ✓','ok') : add('Capitalization ✕','bad');
-      if (opener==='Buying') /Budget:/.test(txt) ? add('Buyer→Budget ✓','ok') : add('Buyer→Budget ✕','bad');
-      if (opener==='Selling' || opener==='Selling or trading') /Price:/.test(txt) ? add('Seller→Price ✓','ok') : add('Seller→Price ✕','bad');
-      if (opener==='Renting out') /Rent:/.test(txt) ? add('Rent ✓','ok') : add('Rent ✕','bad');
-      /(\.|\d)$/.test(txt.trim()) ? add('End punctuation ✓','ok') : add('End punctuation ✕','bad');
-    }
+  }
 
-    /************ Domain lists ************/
-    const OFFICIAL_PLACES = ['Vinewood Hills','Rockford Hills','Richman','Sandy Shores','Paleto Bay','Postal','Hospital','Capitol','Fire Station','Auto Fair','Bahama Mamas Bar','Tequi-la-la Bar','FIB','Hotel Spa Bar','Pacific Bluffs Country Club','Diamond Resort Bar','Vanilla Unicorn Bar','Church','Stock Exchange','Stadium','Chumash','Lifeinvader','Del Perro Pier','Del Perro Beach','Cayo Perico Island','Hotel','Raton Canyon','School','SAHP'];
-    const UNOFFICIAL_PLACES = ['airport','autosalon','beach','beach market','ghetto','post office','train station','yacht'];
-    const BUSINESS_LIST = ['Ammunition Store','Bar','Car wash','Chip tuning','Clothing shop','Cowshed','Electric station','Farm','Flower shop','Freight train','Gas station','Hair salon','Jewelry store','Oil Well','Parking','Plantation','Car sharing','State object','Service station','24/7 Store','Tattoo studio','Taxi company','ATM','Juice shop','Burger shop','Warehouse'];
-    const BLACKLIST = new Set([
-      'firearm','firearms','gun','guns','weapon','weapons','pistol','rifle','shotgun','ammo','ammunition',
-      'bulletproof vest','bulletproof vests','armor plates','armor plate','armor',
-      'weed','cannabis','cannabis seeds','weed seeds','drug','drugs','cocaine',
-      'ems surgical mask','surgical mask','medical mask','covid mask','ems mask',
-      'vehicle scanner','human scanner','resource scanner','scanner','radar','anti-radar',
-      'balaclava','balaclava mask','bandit mask',
-      'rope','ropes','head bag','head bags',
-      'usb with virus',
-      'lock pick','lock picks','lockpick','lockpicks','crowbar','crowbars',
-      'animal skin','satellite dish','barricade','engine block','air horn'
-    ]);
+  // blacklist
+  const bad = hasBlacklist(raw);
+  if(bad){
+    $.out.value = `Rejected: Cannot promote illegal/blacklisted content (“${bad}”).`;
+    setChips(['Rejected','Blacklist']);
+    return;
+  }
 
-    /************ Learning rules ************/
-    // Rule model:
-    // { id, keywords: [string,string,...], opener, moneyLabel, replace: [{find,with}], enabled:true }
-    const LR_KEY = 'li_en03_learning_rules_v1';
-    function loadLR(){ try { return JSON.parse(localStorage.getItem(LR_KEY)) || []; } catch { return []; } }
-    function saveLR(rules){ localStorage.setItem(LR_KEY, JSON.stringify(rules)); renderLR(); }
-    function renderLR(){
-      const box = $('lr-list');
-      const rules = loadLR();
-      if (!rules.length){ box.innerHTML = '<div class="text-secondary">No rules saved yet.</div>'; return; }
-      box.innerHTML = rules.map(r => `
-        <div class="d-flex align-items-start justify-content-between border rounded p-2 mb-2" style="border-color:#1f2937">
-          <div class="small">
-            <div><b>Keywords:</b> ${r.keywords.join(', ')}</div>
-            <div><b>Opener:</b> ${r.opener||'—'} &nbsp; <b>Money:</b> ${r.moneyLabel||'—'}</div>
-            ${r.replace?.length? `<div><b>Replace:</b> ${r.replace.map(a=>`${a.find} → ${a.with}`).join('; ')}</div>`:''}
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" ${r.enabled?'checked':''}
-                onchange="toggleRule('${r.id}', this.checked)">
-            </div>
-            <button class="btn btn-sm btn-outline-danger" onclick="deleteRule('${r.id}')">Delete</button>
-          </div>
-        </div>
-      `).join('');
-    }
-    function toggleRule(id, on){
-      const rules = loadLR();
-      const i = rules.findIndex(x=>x.id===id); if (i>=0){ rules[i].enabled = on; saveLR(rules); }
-    }
-    function deleteRule(id){
-      const rules = loadLR().filter(x=>x.id!==id); saveLR(rules);
-    }
-    function addRuleFromEdit(opener, moneyLabel, subjectBefore, subjectAfter, raw){
-      // keywords: take top 3 rare words from raw
-      const words = Array.from(new Set(lc(raw).match(/[a-z0-9]+/g)||[])).filter(w=>w.length>3);
-      const keywords = words.slice(0,3);
-      const replace = [];
-      if (subjectBefore && subjectAfter && subjectBefore.toLowerCase()!==subjectAfter.toLowerCase()){
-        // naive token change support (e.g., monowheel -> "Monowheel")
-        replace.push({ find: subjectBefore, with: subjectAfter });
-      }
-      const rule = { id: String(Date.now())+'_'+Math.random().toString(36).slice(2),
-                     keywords, opener, moneyLabel, replace, enabled:true };
-      const rules = loadLR(); rules.unshift(rule); saveLR(rules);
-    }
-    function applyRules(raw){
-      if (!$('lr-enabled').checked) return raw;
-      const rules = loadLR().filter(r=>r.enabled);
-      for (const r of rules){
-        if (r.keywords.every(k => raw.toLowerCase().includes(k))){
-          // apply simple replacements
-          if (r.replace){
-            for (const rr of r.replace){
-              const patt = new RegExp(rr.find.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'ig');
-              raw = raw.replace(patt, rr.with);
-            }
-          }
-          // stash overrides for this run
-          window.__lr_override__ = { opener: r.opener || null, moneyLabel: r.moneyLabel || null };
-          break;
-        }
-      }
-      return raw;
-    }
-    renderLR();
+  // detect
+  const action = $.mfOpen.value.startsWith('Auto') ? detectAction(raw) : $.mfOpen.value;
+  const cat = detectCategory(raw);
+  const normalized = normalizeOpenSentence(raw, action, cat);
+  let subject = $.mfSub.value ? $.mfSub.value.trim() : extractSubject(normalized, cat);
+  let amount = $.mfAmt.value ? $.mfAmt.value.trim() : detectAmount(raw);
+  const labelAuto = MONEY_LABEL[action] || 'Price:';
+  const label = $.mfLabel.value.startsWith('Auto') ? labelAuto : $.mfLabel.value;
 
-    /************ Normalizers ************/
-    function normalizeMoney(str){
-      if (!str) return '';
-      let t = ' ' + String(str).trim() + ' ';
-      // k/m shorthand
-      t = t.replace(/\$?\s*([\d.,]+)\s*([kKmM])\b/g, (_, num, suf) => {
-        const val = parseFloat(String(num).replace(/,/g,'.'));
-        if (!isFinite(val)) return `$${num}`;
-        if (suf.toLowerCase()==='k') return `$${dotThousands(Math.round(val*1000))}`;
-        const n = (val % 1 === 0) ? val.toFixed(0) : String(val);
-        return `$${n} Million`;
-      });
-      // plain numbers → $X (no "Million" suffix here)
-      t = t.replace(/\$?\s*(\d{1,3}(?:[,.]\d{3})+|\d+)(?!\s*Million)\b/g, (_, num) => {
-        const clean = String(num).replace(/,/g,'');
-        if (!/^\d+(\.\d+)?$/.test(clean)) return `$${num}`;
-        return `$${dotThousands(clean)}`;
-      });
-      // words
-      t = t.replace(/\bnegotiable\b/ig,'Negotiable').replace(/\beach\b/ig,'each');
-      return t.trim();
-    }
-    function addEndPeriod(s){
-      s = s.trim();
-      if (/\d$/.test(s) && !/\bMillion\.$/i.test(s)) return s; // numeric end (no dot)
-      if (!s.endsWith('.')) s += '.';
-      return s;
-    }
-    function fixPlaces(text){
-      OFFICIAL_PLACES.forEach(p => text = text.replace(new RegExp(p.replace(/[()]/g,'\\$&'), 'ig'), p));
-      UNOFFICIAL_PLACES.forEach(p => text = text.replace(new RegExp(`\\b${p}\\b`, 'ig'), p.toLowerCase()));
-      return text;
-    }
-    function licenseOK(text){
-      const m = /\blicense plate\s*\(([^)]+)\)/i.exec(text);
-      if (!m) return true;
-      const val = m[1].trim();
-      return val.length>=3 && val.length<=7;
-    }
+  // Final sentence
+  let ad = `${action} ${subject}. ${label} ${formatMoneyFromText(amount)}`;
+  ad = /\$\d[\d.]*$| Million$|Negotiable$|each$/.test(ad) ? ad : ensureEndPunctuation(ad);
 
-    /************ Detection ************/
-    function detectAction(raw){
-      const s=lc(raw);
-      // prefer explicit "selling" over generic matches
-      if (/\bselling\s+or\s+trading\b/.test(s)) return 'Selling or trading';
-      if (/\brenting\s+out\b|\brent(?:ing)?\b/.test(s)) return 'Renting out';
-      if (/\bsell(?:ing)?\b/.test(s)) return 'Selling';
-      if (/\btrading\b|\btrade\b/.test(s)) return 'Trading';
-      if (/\bbuy(?:ing)\b|\blooking\s+to\s+buy\b|\blooking\s+to\s+purchase\b|\bpurchase\b/.test(s)) return 'Buying';
-      if (/^looking\s+for\b/.test(s)) return 'Looking for';
-      return 'Selling';
-    }
-    function moneyLabelFor(opener){
-      if (opener==='Buying') return 'Budget';
-      if (opener==='Renting out') return 'Rent';
-      if (opener==='Trading' || opener==='Looking for') return '';
-      return 'Price';
-    }
-    function detectCategory(raw){
-      const s = lc(raw);
-      if (/\b(house|apartment|penthouse|mansion)\b/.test(s)) return 'Real Estate';
-      if (/\b(g\.s\.|w\.h\.|helipad|custom interior)\b/.test(s)) return 'Real Estate';
-      if (/\bdrift kit|turbo kit|visual upgrades|luminous wheels|with full configuration|with partial configuration\b/.test(s)) return 'Auto';
-      if (/\"[^"]+\"/.test(raw)) return 'Auto';
-      for (const b of BUSINESS_LIST){ if (s.includes(lc(b))) return 'Business'; }
-      if (/^looking\s+for\b/.test(s) && /\b(boyfriend|girlfriend|wife|husband|valentine|friends?|family|casino poker players)\b/.test(s)) return 'Dating';
-      if (/\bhiring\b|\blooking\s+for\s+work\b|\bsalary\b|\bconstruction site №\d\b/.test(s)) return 'Work';
-      if (/\bcar\b|\"[^\"]+\"/.test(s)) return 'Auto';
-      return 'Other';
-    }
+  // Bad ending dot rule when ends with number → already handled above
 
-    /************ Builders ************/
-    function buildReal(opener, s){
-      const errors=[];
-      let numMatch = s.match(/\b(?:no\.?|number|num|#|№)\s*([0-9]{1,6})\b/i) || s.match(/\b(house|apartment|penthouse|mansion)\s*(?:no\.?|number|num|#|№)?\s*([0-9]{1,6})\b/i);
-      let typeMatch = s.match(/\b(house|apartment|penthouse|mansion)\b/i);
-      let type = typeMatch ? typeMatch[1].toLowerCase() : 'house';
-      let subject;
-      if (numMatch && numMatch[2]) subject = `${type} №${numMatch[2]}`;
-      else if (numMatch && numMatch[1]) subject = `${type} №${numMatch[1]}`;
-      else subject = (/^[aeiou]/i.test(type)?'an ':'a ') + type;
+  $.out.value = ad;
+  $.mfCat.value = cat;
+  setChips([`Detected: ${cat}`, `Action: ${action}`, `Money label: ${label.replace(':','')}`, 'Capitalization ✓', 'End punctuation ✓']);
+}
 
-      const feats=[];
-      if (/\bgarden\b/i.test(s)) feats.push('a garden');
-      const gs = s.match(/\b(2|5|9|25)\s*(?:g\.?s\.?)\b/i); if (gs) feats.push(`${gs[1]} g.s.`);
-      const wh = s.match(/\b(\d+)\s*(?:w\.?h\.?)\b/i); if (wh) feats.push(`${wh[1]} w.h.`);
-      if (/\bcustom\s+interior\b/i.test(s)) feats.push('custom interior');
-      if (/\binsurance\b/i.test(s) && type!=='apartment') feats.push('insurance');
-      else if (/\binsurance\b/i.test(s) && type==='apartment') errors.push('Apartments cannot be insured.');
-      if (/\bhelipad\b/i.test(s)) feats.push('helipad');
-      if (/\bswimming\s+pool\b/i.test(s)) feats.push('swimming pool');
-      if (/\btennis\s+court\b/i.test(s)) feats.push('tennis court');
-      if (/\blong\s+driveway\b/i.test(s)) feats.push('long driveway');
-      if (/\b(spacious\s+)?backyard\b/i.test(s)) feats.push('spacious backyard');
-      if (/\b(nice|beautiful|great)\s+views?\b/i.test(s)) feats.push('nice views');
+/* --------------------------- Events --------------------------- */
+$.gen.addEventListener('click', parseRaw);
+$.clear.addEventListener('click', ()=>{
+  $.raw.value=''; $.out.value=''; setChips([]); $.mfSub.value=''; $.mfAmt.value=''; $.mfOpen.value='Auto (detected)'; $.mfLabel.value='Auto (detected)'; $.mfCat.value='';
+});
+$.copy.addEventListener('click', ()=>{
+  $.out.select(); document.execCommand('copy');
+});
 
-      if (feats.length){
-        const tail = feats.length===1 ? feats[0] : feats.slice(0,-1).join(', ') + ' and ' + feats.slice(-1);
-        subject += ` with ${tail}`;
-      }
-      let locMatch = s.match(/\b(in|near)\s+([A-Za-z][A-Za-z ]+[A-Za-z])\b/);
-      if (locMatch){ subject += ` ${locMatch[1]} ${locMatch[2]}`; }
-      subject = subject.replace(/\bCasino apartment\b/ig,'Casino penthouse');
-      subject = addEndPeriod(tcFirst(fixPlaces(subject)));
+function applyFromManual(save){
+  const raw = $.raw.value.trim();
+  if(!raw) return;
 
-      let label = moneyLabelFor(opener);
-      let amtRaw = (s.match(/\b(price|budget|rent)\s*[:\-]?\s*([^.,\n]+(?:Million)?(?:\s*each)?)\b/i) || [,'', ''])[2] || (s.match(/\$(?:\s*)[\d\.\,]+(?:\s*Million)?(?:\s*each)?/i)||[''])[0];
-      let mline = '';
-      if (label){
-        if (!amtRaw || /negotiable/i.test(amtRaw)) mline = `${label}: Negotiable.`;
-        else {
-          const norm = normalizeMoney(amtRaw);
-          mline = `${label}: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
-        }
-      }
-      if ((opener==='Trading' || opener==='Selling or trading') && /\b(house|apartment|penthouse|mansion)\b/i.test(subject)) {
-        errors.push('Houses and apartments are not tradable.');
-      }
-      return { text: `${opener} ${subject}${mline?' '+mline:''}`, errors };
-    }
+  const patch = {
+    opener: $.mfOpen.value.startsWith('Auto') ? '' : $.mfOpen.value,
+    subject: $.mfSub.value.trim(),
+    amount: $.mfAmt.value.trim(),
+    label: $.mfLabel.value.startsWith('Auto') ? '' : $.mfLabel.value
+  };
+  // save rule?
+  if(save){
+    addRule(raw, patch);
+  }
+  parseRaw();
+}
 
-    function buildAuto(opener, s){
-      const errors=[];
-      let name = (s.match(/"([^"]+)"/)||[])[0];
-      if (!name){
-        // try Monowheel/brands as subject token; fallback 'a car'
-        const nm = s.match(/\b([A-Z][a-zA-Z]+(?:[- ](?:[A-Z0-9][a-zA-Z0-9()\-]+))+)\b/);
-        name = nm ? `"${nm[1]}"` : (/\bmonowheel\b/i.test(s)? '"Monowheel"' : 'a car');
-      }
-      const bits=[];
-      if (/\b(full\s*config|max\s*config|fully\s*upgraded)\b/i.test(s)) bits.push('with full configuration');
-      else if (/\b(partial|nearly max|lvl ?[1-3]|level ?[1-3])\b/i.test(s)) bits.push('with partial configuration');
-      if (/\bvisual\b|\bbody kit\b|\bbody upgrades\b/i.test(s)) bits.push('visual upgrades');
-      if (/\bluminous (rims|wheels)|unique wheels/i.test(s)) bits.push('luminous wheels');
-      if (/\binsurance\b/i.test(s)) bits.push('insurance');
-      if (/\bturbo\b/i.test(s)) bits.push('turbo kit');
-      if (/\bdrift\b/i.test(s)) bits.push('drift kit');
+$.apply.addEventListener('click', ()=>applyFromManual(false));
+$.applySave.addEventListener('click', ()=>applyFromManual(true));
+$.autoApply.checked = localStorage.getItem('li_auto_apply')==='1';
+$.autoApply.addEventListener('change', ()=> localStorage.setItem('li_auto_apply', $.autoApply.checked?'1':'0'));
+updateRuleInfo();
 
-      let subject = name;
-      if (bits.length){
-        subject += ' ' + (bits[0].startsWith('with')? bits[0] : 'with '+bits[0]);
-        if (bits.length>1) subject += ', ' + bits.slice(1).join(', ');
-      }
-      subject = addEndPeriod(tcFirst(subject));
+/* --------------------------- Auto money label on opener change --------------------------- */
+$.mfOpen.addEventListener('change', ()=>{
+  if($.mfOpen.value && !$.mfOpen.value.startsWith('Auto')){
+    const guess = MONEY_LABEL[$.mfOpen.value] || 'Price:';
+    $.mfLabel.value = guess;
+  } else {
+    $.mfLabel.value = 'Auto (detected)';
+  }
+});
 
-      let label = moneyLabelFor(opener);
-      let amtRaw = (s.match(/\b(price|budget|rent)\s*[:\-]?\s*([^.,\n]+(?:Million)?(?:\s*each)?)\b/i) || [,'', ''])[2] || (s.match(/\$(?:\s*)[\d\.\,]+(?:\s*Million)?/i)||[''])[0];
-      let mline = '';
-      if (label){
-        if (!amtRaw || /negotiable/i.test(amtRaw)) mline = `${label}: Negotiable.`;
-        else {
-          const norm = normalizeMoney(amtRaw);
-          mline = `${label}: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
-        }
-      } else if (amtRaw){
-        const norm = normalizeMoney(amtRaw);
-        mline = `Price: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
-      }
-      return { text: `${opener} ${subject}${mline?' '+mline:''}`, errors };
-    }
-
-    function buildBusiness(opener, s){
-      let name = BUSINESS_LIST.find(b => lc(s).includes(lc(b))) || 'ATM';
-      let num = (s.match(/\b(?:no\.?|number|num|#|№)\s*(\d+)\b/i)||[])[1];
-      let subj = name + (num? ` №${num}` : ' business');
-      subj = addEndPeriod(tcFirst(subj));
-      let label = moneyLabelFor(opener) || 'Price';
-      let amtRaw = (s.match(/\b(price|budget)\s*[:\-]?\s*([^.,\n]+(?:Million)?)\b/i) || [,'',''])[2] || (s.match(/\$(?:\s*)[\d\.\,]+(?:\s*Million)?/i)||[''])[0];
-      let mline='';
-      if (!amtRaw || /negotiable/i.test(amtRaw)) mline = `${label}: Negotiable.`;
-      else {
-        let norm = normalizeMoney(amtRaw);
-        const over = /\$?(\d+)\s*Million/i.exec(norm);
-        if (over && Number(over[1])>300) norm = 'Negotiable';
-        mline = `${label}: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
-      }
-      return { text: `${opener} ${subj} ${mline}`.trim(), errors:[] };
-    }
-
-    function buildDating(s){
-      let personMatch = s.match(/\b([A-Z][a-z]+)\s+([A-Z][a-z]+)\b/);
-      let base = 'Looking for ';
-      if (personMatch){
-        base += `${tcFirst(personMatch[1])} ${tcFirst(personMatch[2])}.`;
-      } else {
-        const phrase = (s.match(/looking\s+for\s+([a-z ]+)/i)||[])[1];
-        base += phrase ? phrase.trim().replace(/\.$/, '') + '.' : 'a friend.';
-      }
-      return { text: addEndPeriod(tcFirst(base)), errors:[] };
-    }
-
-    function buildWork(s){
-      let hiring = /\bhiring\b/i.test(s);
-      let role = (s.match(/\bhiring\s+([a-z ]+)/i)||[])[1] || (s.match(/\blooking\s+for\s+work\s+as\s+([a-z ]+)/i)||[])[1] || (s.match(/\b(driver|lawyer|dj|photographer|bodyguard|dancer|professional singer|assistant|trucker|electrician|gardener|surveyor|locksmith)\b/i)||[])[1] || 'workers';
-      role = role.trim();
-      let subj = hiring ? `Hiring ${role}` : `${tcFirst(role)} looking for work`;
-      const site = (s.match(/construction site\s*(?:№|#)?\s*(1|2|3)/i)||[])[1];
-      if (site){
-        const siteMap = {1:'Vespucci Boulevard',2:'Calais Avenue',3:'Pillbox Hill'};
-        subj += ` at Construction site №${site}, ${siteMap[site]}`;
-      }
-      subj = addEndPeriod(tcFirst(subj));
-      let salaryRaw = (s.match(/\b(?:salary|pay|bonus)\s*[:\-]?\s*([^.,\n]+(?:Million)?)\b/i)||[])[1];
-      let mline = salaryRaw ? `Salary: ${normalizeMoney(salaryRaw)}` : 'Salary: Negotiable';
-      if (!/\.$/.test(mline)) mline = addEndPeriod(mline);
-      return { text: `${subj} ${mline}`.trim(), errors:[] };
-    }
-
-    /************ Main generator ************/
-    function clearRaw(){
-      $('rawInput').value='';
-      $('finalOutput').value='';
-      $('chips').innerHTML='';
-      $('checks').innerHTML='';
-      $('errors').innerHTML='';
-      $('mf-opener').value='auto';
-      $('mf-subject').value='';
-      $('mf-money-label').value='auto';
-      $('mf-amount').value='';
-      window.__lr_override__ = null;
-    }
-
-    function preprocess(raw){
-      // Apply learned rules first
-      raw = applyRules(raw);
-
-      // Normalize common phrases, typos, №, and level→quality
-      return raw
-        .replace(/looking to buy|looking to purchase/ig,'Buying')
-        .replace(/\bbuyyingng\b/ig,'Buying')
-        .replace(/\bno\.\b/ig,'№')
-        .replace(/\bhouse\s*(?:number|num|#)\s*/ig,'house №')
-        .replace(/\bapartment\s*(?:number|num|#)\s*/ig,'apartment №')
-        .replace(/\b(level|lvl)\s*1\b/ig,'low quality')
-        .replace(/\b(level|lvl)\s*2\b/ig,'medium quality')
-        .replace(/\b(level|lvl)\s*3\b/ig,'high quality')
-        .replace(/\b(level|lvl)\s*4\b/ig,'max quality');
-    }
-
-    function generateFromRaw(){
-      let raw = ($('rawInput').value||'').trim();
-      $('finalOutput').value=''; $('chips').innerHTML=''; $('checks').innerHTML=''; $('errors').innerHTML='';
-      window.__lr_override__ = null;
-      if (!raw) return;
-
-      const badWord = Array.from(BLACKLIST).find(b => lc(raw).includes(b));
-      if (badWord){ setErrors([`Rejected: contains blacklisted term: ${badWord}`]); return; }
-
-      const pre = preprocess(raw);
-
-      // Action and category (with possible overrides from learning)
-      let action = detectAction(pre);
-      let category = detectCategory(pre);
-      if (window.__lr_override__?.opener) action = window.__lr_override__.opener;
-      let labelOverride = window.__lr_override__?.moneyLabel || null;
-      let moneyLabel = labelOverride || moneyLabelFor(action);
-
-      let out='', errs=[];
-      if (category==='Real Estate'){ ({text:out, errors:errs}=buildReal(action, pre)); }
-      else if (category==='Auto'){ ({text:out, errors:errs}=buildAuto(action, pre)); }
-      else if (category==='Business'){ ({text:out, errors:errs}=buildBusiness(action, pre)); }
-      else if (category==='Dating'){ ({text:out, errors:errs}=buildDating(pre)); }
-      else if (category==='Work'){ ({text:out, errors:errs}=buildWork(pre)); }
-      else { ({text:out, errors:errs}=buildOther(action, pre)); }
-
-      // Standard cleanups
-      out = out.replace(/\bhouse\s+no\s+(\d+)/ig,'house №$1')
-               .replace(/\bapartment\s+no\s+(\d+)/ig,'apartment №$1')
-               .replace(/\bpenthouse\s+no\s+(\d+)/ig,'penthouse №$1')
-               .replace(/\bmansion\s+no\s+(\d+)/ig,'mansion №$1');
-
-      out = out.replace(/\b(Price|Budget|Rent):\s*([^.\n]+)(?!\.)/g, (_,L,val)=>{
-        const norm=normalizeMoney(val);
-        return `${L}: ${norm}${/\bMillion$/.test(norm) ? '.' : (/\d$/.test(norm)? '' : '.')}`;
-      });
-
-      out = tcFirst(fixPlaces(out));
-      if (!licenseOK(out)) errs.push('License plate must be 3–7 characters in length.');
-      $('finalOutput').value = out;
-      showChips({category, action, moneyLabel});
-      setChecks(out, action);
-      setErrors(errs);
-
-      // Prefill manual fields
-      $('mf-opener').value='auto';
-      $('mf-subject').value = out.replace(/^(Buying|Selling|Trading|Selling or trading|Renting out|Looking for)\s+/,'').replace(/\s+(Price|Budget|Rent):.*$/,'').trim();
-      $('mf-money-label').value = (out.match(/\b(Price|Budget|Rent):/i)||[])[1]?.toLowerCase() || 'none';
-      $('mf-amount').value = (out.match(/\b(Price|Budget|Rent):\s*([^\.\n]+)/i)||[])[2] || '';
-    }
-
-    function applyManualFix(saveAsRule){
-      const openerSel = $('mf-opener').value;
-      const subject = $('mf-subject').value.trim();
-      const labelSel  = $('mf-money-label').value;
-      let amount = $('mf-amount').value.trim();
-      if (!subject){
-        setErrors(['Manual Fix: Subject cannot be empty.']); return;
-      }
-
-      // opener
-      let opener = openerSel==='auto'
-        ? ( ($('finalOutput').value.match(/^(Buying|Selling|Trading|Selling or trading|Renting out|Looking for)/)||[])[1] || 'Selling' )
-        : ({
-            selling:'Selling', buying:'Buying', trading:'Trading',
-            sot:'Selling or trading', renting:'Renting out', looking:'Looking for'
-          }[openerSel]);
-
-      // money label
-      let label = labelSel==='auto'
-        ? ( ($('finalOutput').value.match(/\b(Price|Budget|Rent):/i)||[])[1] || '' )
-        : (labelSel==='none' ? '' : ({price:'Price',budget:'Budget',rent:'Rent'}[labelSel]));
-
-      // amount
-      if (label){
-        amount = amount ? normalizeMoney(amount) : 'Negotiable';
-      } else {
-        amount = '';
-      }
-
-      // rebuild final line
-      let out = `${opener} ${tcFirst(subject)}`;
-      if (!/[.\d]$/.test(out)) out = addEndPeriod(out);
-      if (label){
-        out += ' ' + `${label}: ${amount}${/\bMillion$/.test(amount) ? '.' : (/\d$/.test(amount)? '' : '.')}`;
-      }
-      out = tcFirst(fixPlaces(out));
-      $('finalOutput').value = out;
-
-      if (saveAsRule){
-        // Save a learning rule based on this correction
-        const beforeSubject = ($('finalOutput').value.match(/^(?:Buying|Selling|Trading|Selling or trading|Renting out|Looking for)\s+(.+?)(?:\s+(?:Price|Budget|Rent):|$)/)||[])[1] || '';
-        const raw = $('rawInput').value || '';
-        addRuleFromEdit(opener, label, beforeSubject, subject, raw);
-      }
-    }
-
-    // initial render of learning rules
-    document.addEventListener('DOMContentLoaded', renderLR);
-  </script>
+/* --------------------------- Demo examples (optional) --------------------------- */
+if(!location.hash && !localStorage.getItem('li_first')){
+  $.raw.value = 'selling plantation business no 5 price 50m';
+  localStorage.setItem('li_first','1');
+}
+</script>
 </body>
 </html>
