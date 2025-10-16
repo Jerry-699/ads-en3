@@ -1,89 +1,86 @@
 {
-  "_note": "You can extend these arrays/maps endlessly. The app loads them and stays fast.",
   "blacklist": [
-    "firearm", "gun", "pistol", "rifle", "ammunition", "bulletproof vest", "armor plate",
-    "weed", "cannabis", "drug", "cocaine", "ems mask", "surgical mask", "covid mask",
-    "vehicle scanner", "human scanner", "resource scanner", "radar",
-    "balaclava", "rope", "head bag", "usb with virus", "lock pick", "crowbar",
-    "troll ad", "bandit mask", "animal skin", "satellite dish", "barricade", "anti-radar"
+    "firearm","gun","pistol","rifle","shotgun","ammo","ammunition","bulletproof","armor plate",
+    "weed","cannabis","marijuana","cocaine","drug","balaclava","covid mask","ems mask","surgical mask",
+    "radar","scanner","anti-radar","head bag","rope","crowbar","usb with virus","troll ad",
+    "animal skin","barricade","satellite dish","engine block","air horn","grand coin","battlepass",
+    "nationality","sexual","sell people","hype body","branded armor","gang","black market","mega mall",
+    "playboy family","driving license","air transport license","boat transport license"
   ],
-  "forbiddenPlaces": [
-    "mega mall", "gang hq", "ballas", "vagos", "families", "bloods", "marabunta",
-    "black market", "lspd", "fib", "sahp", "ems", "government", "ghetto"
+  "nonsellable_autos_regex": [
+    "(?:^|\\s)p1\\s*car\\b"
   ],
-  "officialPlaces": [
+  "business_map": {
+    "barber":"Hair salon business",
+    "barber shop":"Hair salon business",
+    "hair salon":"Hair salon business",
+    "gun store":"Ammunition Store business",
+    "weapon store":"Ammunition Store business",
+    "drug lab":"Burger shop business",
+    "charging station":"Electric station business",
+    "auto workshop":"Service station business",
+    "service station":"Service station business",
+    "24/7":"24/7 Store business",
+    "24/7 store":"24/7 Store business",
+    "atm":"ATM business",
+    "car wash":"Car wash business",
+    "chip tuning":"Chip tuning business",
+    "clothing shop":"Clothing shop business",
+    "cowshed":"Cowshed business",
+    "plantation":"Plantation business",
+    "taxi company":"Taxi company business",
+    "grand elite":"Grand Elite business",
+    "jewelry store":"Jewelry store business",
+    "oil well":"Oil Well business",
+    "parking":"Parking business",
+    "pet shop":"Pet Shop business",
+    "car sharing":"Car sharing business",
+    "state object":"State object business",
+    "tattoo studio":"Tattoo studio business",
+    "gas station":"Gas station business",
+    "burger shop":"Burger shop business",
+    "warehouse":"Warehouse business",
+    "freight train":"Freight train business",
+    "flower shop":"Flower shop business",
+    "electric station":"Electric station business",
+    "farm":"Farm business",
+    "juice shop":"Juice shop business",
+    "fight club":"Fight club business"
+  },
+  "container_map": [
+    {"pattern":"\\bp1\\s*car\\s*(cases?|containers?)\\b","out":"Progen containers"},
+    {"pattern":"\\bwheels\\s*1\\s*containers?\\b","out":"wheels 1 containers"},
+    {"pattern":"\\bwheels\\s*2\\s*containers?\\b","out":"wheels 2 containers"},
+    {"pattern":"\\bwheels\\s*3\\s*containers?\\b","out":"wheels 3 containers"},
+    {"pattern":"\\bgrand\\s*racers\\s*containers?\\b","out":"Grand racers containers"},
+    {"pattern":"\\bbenefactor\\s*e500\\s*\\(w124\\)\\s*containers?\\b","out":"Benefactor E500 (W124) containers"},
+    {"pattern":"\\bprogen\\s*containers?\\b","out":"Progen containers"}
+  ],
+  "official_places":[
     "Vinewood Hills","Rockford Hills","Richman","Sandy Shores","Paleto Bay","Postal","Hospital","Capitol",
     "Fire Station","Auto Fair","Bahama Mamas Bar","Tequi-la-la Bar","FIB","Hotel Spa Bar",
     "Pacific Bluffs Country Club","Diamond Resort Bar","Vanilla Unicorn Bar","Church","Stock Exchange",
     "Stadium","Chumash","Lifeinvader","Del Perro Pier","Del Perro Beach","Cayo Perico Island",
     "Hotel","Raton Canyon","School","SAHP"
   ],
-  "unofficialPlaces": [
-    "airport","autosalon","beach","beach market","ghetto","post office","train station","yacht"
-  ],
-  "beachMarket": { "noNegotiable": true, "goodPrices": true },
-  "apartmentsNoInsurance": true,
-  "apartmentComplexes": [
-    "Eclipse Towers","Tinsel Towers","Del Perro Heights","Richards Majestic","Tinkle Building",
-    "3 Alta Street","Celltowa Building","near the beach market"
-  ],
-  "autoFairPhrase": "at Auto Fair",
-  "businessNames": {
-    "gun store": "Ammunition Store",
-    "weapon store": "Ammunition Store",
-    "barber": "Hair salon",
-    "drug lab": "Burger shop",
-    "personal business": "private business",
-    "charging station": "Electric station",
-    "auto workshop": "Service station",
-    "binco": "Clothing shop",
-    "suburban": "Clothing shop"
+  "unofficial_places":[ "airport","autosalon","beach","beach market","ghetto","post office","train station","yacht" ],
+  "re_keywords":{
+    "types":["house","apartment","penthouse","mansion"],
+    "features":{
+      "garden":["garden"],
+      "gs":["(\\b2|5|9|25)\\s*(g\\.?s\\.?)"],
+      "wh":["(\\b3|4|5)\\s*(w\\.?h\\.?)"],
+      "custom":["custom interior"],
+      "insurance":["insurance"],
+      "helipad":["helipad"],
+      "others":["swimming pool","tennis court","long driveway","large driveway","spacious backyard","backyard","nice views","beautiful views","great views","views"]
+    }
   },
-  "businessList": [
-    "Ammunition Store","Bar","Car wash","Chip tuning","Clothing shop","Cowshed","Electric station",
-    "Farm","Flower shop","Freight train","Gas station","Grand Elite","Hair salon","Jewelry store",
-    "Oil Well","Parking","Pet Shop","Plantation","Car sharing","State object","Service station",
-    "24/7 Store","Tattoo studio","Taxi company","ATM","Juice shop","Burger shop","Warehouse"
-  ],
-  "containers": [
-    "valuable container","desert scarf mask container","biker container","Brand T-shirts 2 container",
-    "trucker container","racer container","Grand racers container","Ingrand container","Progen container",
-    "Maserati container","Benefactor container","gardener container","rare love container","regular love container",
-    "Renault container","resources container","diver container","organization container","sphere of influence container",
-    "wheels 1 container","wheels 2 container","wheels 3 container","old autumn gold container","old summer gold container",
-    "old winter gold container","School container","arena container","daily container","Halloween container",
-    "womens gift container of type 1","womens gift container of type 2","mens gift container of type 1","mens gift container of type 2",
-    "blue womens top container of type 4","black womens top container of type 4","Benefactor E500 (W124) container",
-    "daily study of the organization container","Captured caravans container","Delivered caravans container","Valentine 2025 container"
-  ],
-  "petsShoulder": [
-    "six tailed fox on shoulder pet","hamster on shoulder pet","strong chicken on shoulder pet","owl on shoulder pet",
-    "flying bear on shoulder pet","toothless dragon on shoulder pet","leon brawl on shoulder pet","lovely bird egg on shoulder pet",
-    "Mr. Robot friend on shoulder pet","el primo corazon brawl on shoulder pet","black voron on shoulder pet"
-  ],
-  "petsCaged": [
-    "Border Collie","Cat","Cougar","Cyberdog","Husky","Panther","Pig","Poodle","Monkey","Pug","Christmas Elf",
-    "Santa Claus","Fancy bear","Cute Hippo","New years Husky","Rabbit","Rat","Retriever","Robobeast","Rooster","Puma",
-    "Rottweiler","Westie","Kitty Bunny","Duckling","Panda","Lion Cub","Mini Robot"
-  ],
-  "tickets": [
-    "Grand ticket","Car ticket","Cayo Perico ticket","flame and water lottery ticket","rare lottery ticket","regular lottery ticket",
-    "Secret ticket","Secret ticket fragment","Resource Miners ticket","New years gift","A Little gift","A Big gift"
-  ],
-  "juices": [
-    "attack juice","protection juice","endurance juice","riding juice","power juice","immunity juice","fast running juice",
-    "25% protection juice","juice on becoming an animal","juice for double the payment"
-  ],
-  "miningResources": [
-    "copper","emeralds","rubies","diamonds","an emerald","a ruby","a diamond"
-  ],
-  "tuningParts": [
-    "engine tuning","transmission tuning","brakes tuning","suspension tuning","tires tuning"
-  ],
-  "itemsOther": [
-    "pickaxe","battery","repair kit","video card","paint can","threads","fuel canister","premium fuel canister",
-    "Grand ticket","SIM card","pet food","tonic treat","token","snow","solar panel","seed","mushroom","timber","scrap metal",
-    "toothy mask","luminous wheels","luminous stone","mask","license plate","dice","hookah","fishing rod","fishing rods",
-    "backpack skin","inventory","container","barrels","resource barrel","elixir for a pet"
+  "work_roles":["trucker","lawyer","dj","photographer","bodyguard","professional dancer","personal driver","assistant","professional singer","electrician","locksmith","gardener","surveyor","driver"],
+  "work_sites":["construction site №1","construction site №2","construction site №3"],
+  "dating_allowed":[
+    "^looking for (?:[A-Z][a-z]+ [A-Z][a-z]+)\\.?$",
+    "^looking for (?:a )?(?:wife|husband|boyfriend|girlfriend|family|family members|date|valentine|friend|friends)\\.?$",
+    "^looking for casino poker players\\.?$"
   ]
 }
