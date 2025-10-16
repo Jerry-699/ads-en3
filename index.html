@@ -1,0 +1,375 @@
+import React, { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Search, Wand2, Trash2, Copy, AlertTriangle, CheckCircle2, Settings2 } from "lucide-react";
+
+// =============================================================
+// Lifeinvader Ad Formatter — EN-03 Policy Aware (Updated)
+// Key fixes:
+// - Strict action-based suffix: Buying→Budget, Selling/Selling or trading→Price, Renting out→Rent,
+//   Trading→no suffix (unless an explicit amount is present).
+// - Strips *any* existing Price/Budget/Rent fragments (including “Negotiable”) before re-appending.
+// - Keeps # rules: № symbol, thousand dots, Million wording, period rules, term substitutions, blacklist.
+// =============================================================
+
+function capitalizeFirst(str: string): string {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function ensureFinalPeriod(sentence: string): string {
+  if (!sentence) return sentence;
+  // If it ends with a number, do not add a period.
+  if (/\d$/.test(sentence)) return sentence;
+  if (/[.!?]$/.test(sentence)) return sentence;
+  return sentence + ".";
+}
+
+function normalizeSpaces(s: string): string {
+  return s.replace(/\s+/g, " ").trim();
+}
+
+function toNumber(value: string): number | null {
+  if (!value) return null;
+  let v = value.trim().toLowerCase();
+  v = v.replace(/[$,\s]/g, "");
+
+  // e.g. 1k / 1.7k
+  if (/^[0-9]+(\.[0-9]+)?k$/.test(v)) return Math.round(parseFloat(v.replace("k", "")) * 1000);
+  // e.g. 1m / 1.45m
+  if (/^[0-9]+(\.[0-9]+)?m$/.test(v)) return Math.round(parseFloat(v.replace("m", "")) * 1_000_000);
+  // 1.500 style
+  if (/^[0-9]+(\.[0-9]{3})*$/.test(v)) return parseInt(v.replace(/\./g, ""), 10);
+  // 1,500 style
+  if (/^[0-9]+(,[0-9]{3})*$/.test(v)) return parseInt(v.replace(/,/g, ""), 10);
+  // plain 1500 or 1500.5
+  if (/^[0-9]+(\.[0-9]+)?$/.test(v)) return parseFloat(v);
+
+  return null;
+}
+
+function formatMoneyAccordingToPolicy(n: number): string {
+  // ≥ 1,000,000 -> $X[.YY] Million
+  if (n >= 1_000_000) {
+    const m = Math.round((n / 1_000_000) * 100) / 100;
+    return `$${m} Million`;
+  }
+  // thousands use dot separators: 1500 -> $1.500
+  const withDots = n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `$${withDots}`;
+}
+
+// -----------------------------
+// Policy tables
+// -----------------------------
+
+const BLACKLIST = [
+  "firearm","gun","pistol","rifle","ammunition","bullet","bulletproof vest","armor plate","armor plates",
+  "weed","cannabis","cocaine","drug","drugs",
+  "ems surgical mask","surgical mask","medical mask","covid mask","ems mask",
+  "scanner","radar","anti-radar","vehicle scanner","human scanner","resource scanner",
+  "balaclava","bandit mask",
+  "rope","ropes","lockpick","lock pick","lock-pick","crowbar","crow bar",
+  "animal skin","satellite dish","barricade","engine block","air horn",
+  "nationality","sale of people","sexual","sex","buying a wife","buying a husband",
+];
+
+const SUBS: Array<[RegExp, string]> = [
+  [/\blooking to buy\b/gi, "Buying"],
+  [/\blooking to purchase\b/gi, "Buying"],
+  [/\blook(?:ing)? for\b/gi, "Looking for"],
+  [/\bgreen zone\b/gi, ""],
+  [/\bmax config\b/gi, "full configuration"],
+  [/\bmax tuning\b/gi, "full configuration"],
+  [/\bfully upgraded\b/gi, "full configuration"],
+  [/\bnearly max\b/gi, "partial configuration"],
+  [/\b(part)?lvl\s*([1-4])\b/gi, (_m, _p, d) => {
+    const map: any = {1: "low quality", 2: "medium quality", 3: "high quality", 4: "max quality"};
+    return map[d] || "high quality";
+  }],
+  [/\bbody (?:upgrades|kit)\b/gi, "visual upgrades"],
+  [/\bturbo\b/gi, "turbo kit"],
+  [/\bdrift tuning|drift assistance\b/gi, "drift kit"],
+  [/\bluminous (?:rims|unique wheels?)\b/gi, "luminous wheels"],
+  [/\bextras\b/gi, "type"],
+  [/\bcase(s)?\b/gi, "container$1"],
+  [/\bcases\b/gi, "containers"],
+  [/\bcrates\b/gi, "containers"],
+  [/\bspray (?:cans|balloons)\b/gi, "paint cans"],
+  [/\bmonowheel\s*type\s*(\d+)/gi, "Monowheel of type $1"],
+];
+
+function normalizePropertyNumber(s: string): string {
+  return s
+    .replace(/\b(house|apartment|penthouse|mansion)\s*(no\.|no|number|#)\s*(\d+)/gi, (_m, t, _n, num) => `${t} №${num}`)
+    .replace(/\b№\s*(\d+)/g, (_m, d) => `№${d}`);
+}
+
+function detectAction(raw: string): "Selling" | "Buying" | "Trading" | "Selling or trading" | "Renting out" | null {
+  const s = raw.toLowerCase();
+  if (/\brenting out\b/.test(s)) return "Renting out";
+  if (/\bselling or trading\b/.test(s)) return "Selling or trading";
+  if (/\btrading\b/.test(s)) return "Trading";
+  if (/\bbuying\b/.test(s)) return "Buying";
+  if (/\bselling\b/.test(s)) return "Selling";
+  if (/\blooking to buy|looking to purchase\b/.test(s)) return "Buying";
+  return null;
+}
+
+function extractExplicitAmount(raw: string): { amount: number | null } {
+  const match = raw.match(/\$?\s*([0-9]+(?:[.,][0-9]+)*(?:k|m)?)/i);
+  if (match) {
+    const n = toNumber(match[1]);
+    return { amount: n ?? null };
+  }
+  return { amount: null };
+}
+
+function containsBlacklist(raw: string): string | null {
+  const s = raw.toLowerCase();
+  for (const term of BLACKLIST) if (s.includes(term)) return term;
+  return null;
+}
+
+function stripPriceFragments(text: string): string {
+  // Remove *any* Price/Budget/Rent fragments before we append the correct one.
+  return text
+    // with numbers: "Price: $1.500", "Budget $10 Million"
+    .replace(/\b(?:price|budget|rent)\s*[:=]?\s*\$?[0-9.,]+(?:\s*(?:million|m))?\.?/gi, "")
+    // with words only: "Price: Negotiable.", "Budget: firm."
+    .replace(/\b(?:price|budget|rent)\s*[:=]?\s*(?:negotiable|firm|fixed|obo|no ?negotiation|none|n\/a)\.?/gi, "");
+}
+
+// ---------------------------------
+// Main formatter
+// ---------------------------------
+
+function formatAd(rawInput: string): { ok: boolean; output: string; reason?: string } {
+  if (!rawInput || !rawInput.trim()) return { ok: false, output: "", reason: "Empty input" };
+
+  let raw = normalizeSpaces(rawInput);
+
+  // Safety: blacklist
+  const bad = containsBlacklist(raw);
+  if (bad) return { ok: false, output: "", reason: `Cannot promote illegal/blacklisted content: "${bad}"` };
+
+  // Substitutions and normalizations
+  for (const [rx, rep] of SUBS) raw = raw.replace(rx, rep as any);
+  raw = normalizePropertyNumber(raw);
+
+  // Detect action (default to Selling unless the user started with Looking for)
+  let action = detectAction(raw);
+  if (!action) {
+    if (!/^looking for\b/i.test(raw)) {
+      raw = `Selling ${raw}`;
+      action = "Selling";
+    }
+  }
+
+  // Amount handling
+  const { amount } = extractExplicitAmount(raw);
+  const trailer = amount !== null ? formatMoneyAccordingToPolicy(amount) : "Negotiable";
+
+  // STRICT key by action (policy):
+  // Buying → Budget | Selling/Selling or trading → Price | Renting out → Rent | Trading → none (unless amount exists)
+  let priceKey: "Price" | "Budget" | "Rent" | null = "Price";
+  if (action === "Buying") priceKey = "Budget";
+  else if (action === "Renting out") priceKey = "Rent";
+  else if (action === "Trading") priceKey = null; // default: no suffix for Trading
+  else priceKey = "Price"; // Selling / Selling or trading
+
+  // Remove any pre-existing suffix before appending the correct one
+  raw = stripPriceFragments(raw).trim();
+
+  // Tidy punctuation
+  raw = raw.replace(/\s{2,}/g, " ").replace(/\s*\.$/, "");
+  raw = capitalizeFirst(raw);
+
+  // Assemble
+  let sentence = raw;
+  if (priceKey) {
+    sentence = `${sentence}. ${priceKey}: ${trailer}`.trim();
+  } else if (amount !== null) {
+    // Trading but a number was explicitly given: use Price per policy examples style
+    sentence = `${sentence}. Price: ${trailer}`.trim();
+  }
+
+  // Final polish
+  sentence = normalizeSpaces(sentence);
+  sentence = ensureFinalPeriod(sentence);
+  sentence = sentence
+    .replace(/\b(Budget|Price|Rent)\s*:\s*\./g, "$1: Negotiable.")
+    .replace(/\s+\./g, ".");
+
+  return { ok: true, output: sentence };
+}
+
+// Bulk helper
+function processBulk(text: string): { rows: Array<{ input: string; result: string; ok: boolean; reason?: string }> } {
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const rows = lines.map(line => {
+    const r = formatAd(line);
+    return { input: line, result: r.output, ok: r.ok, reason: r.reason };
+  });
+  return { rows };
+}
+
+// ---------------------------------
+// UI
+// ---------------------------------
+
+export default function App() {
+  const [input, setInput] = useState("");
+  const [bulk, setBulk] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
+
+  const single = useMemo(() => formatAd(input), [input]);
+  const bulkRows = useMemo(() => processBulk(bulk), [bulk]);
+
+  const copy = async (txt: string) => {
+    try { await navigator.clipboard.writeText(txt); } catch {}
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      <header className="sticky top-0 z-10 bg-white border-b">
+        <div className="max-w-5xl mx-auto flex items-center gap-3 px-4 py-3">
+          <Wand2 className="w-6 h-6" />
+          <h1 className="text-xl font-semibold">Lifeinvader Ad Formatter</h1>
+          <span className="text-xs text-gray-500 ml-2">EN-03 policy aware</span>
+          <button onClick={() => setShowSettings(v=>!v)} className="ml-auto inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border hover:bg-gray-50">
+            <Settings2 className="w-4 h-4"/> Settings
+          </button>
+        </div>
+      </header>
+
+      {showSettings && (
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="p-4 rounded-2xl border bg-white text-sm text-gray-700 mb-6">
+            <p className="mb-2 font-medium">How it follows the policy</p>
+            <ul className="list-disc ml-5 space-y-1">
+              <li><b>Buying → Budget</b>, <b>Selling/Selling or trading → Price</b>, <b>Renting out → Rent</b>, <b>Trading → no suffix</b> unless an amount is present.</li>
+              <li>Always strips any typed <i>Price/Budget/Rent</i> (even “Negotiable.”) before adding the correct line.</li>
+              <li>Converts 1k/1.7k/1m → <code>$1.000/$1.700/$1 Million</code>. Uses dot separators and “Million”.</li>
+              <li>Property numbers normalize to <code>№</code>; common terms auto-correct (extras→type, turbo→turbo kit, etc.).</li>
+              <li>Full stop at the end unless the ad ends with a number.</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      <main className="max-w-5xl mx-auto px-4 py-6 grid gap-6 lg:grid-cols-2">
+        {/* Quick Mode */}
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Search className="w-5 h-5"/>
+            <h2 className="font-semibold">Quick format</h2>
+          </div>
+          <div className="bg-white border rounded-2xl p-4 shadow-sm">
+            <textarea
+              value={input}
+              onChange={e=>setInput(e.target.value)}
+              placeholder='Try: "Buying Plantation business. Price: Negotiable."'
+              className="w-full min-h-[120px] outline-none resize-y rounded-xl p-3 bg-gray-50 focus:bg-white"
+            />
+            <div className="mt-4">
+              {single.ok ? (
+                <motion.div initial={{opacity:0,y:4}} animate={{opacity:1,y:0}} className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-1"/>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-800">Formatted ad</div>
+                    <div className="mt-1 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm">
+                      {single.output}
+                    </div>
+                    <div className="mt-2 flex gap-2">
+                      <button onClick={()=>copy(single.output)} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border hover:bg-gray-50"><Copy className="w-4 h-4"/> Copy</button>
+                      <button onClick={()=>setInput("")} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-gray-600 hover:bg-gray-50"><Trash2 className="w-4 h-4"/> Clear</button>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 mt-1"/>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-800">Rejected</div>
+                    <div className="mt-1 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+                      {single.reason}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Bulk Mode */}
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Wand2 className="w-5 h-5"/>
+            <h2 className="font-semibold">Bulk format</h2>
+          </div>
+          <div className="bg-white border rounded-2xl p-4 shadow-sm">
+            <textarea
+              value={bulk}
+              onChange={e=>setBulk(e.target.value)}
+              placeholder={'Paste multiple raw ads, one per line.\nExample:\nBuying Plantation business. Price: Negotiable.\nSelling seeds 1.5k each\nTrading "Ubermacht M5 (E34)" for "Grotti Italia (F458)"'}
+              className="w-full min-h-[180px] outline-none resize-y rounded-xl p-3 bg-gray-50 focus:bg-white"
+            />
+
+            <div className="mt-4 space-y-2 max-h-72 overflow-auto pr-1">
+              {bulkRows.rows.map((r, i) => (
+                <div key={i} className="border rounded-xl p-3 flex items-start gap-3">
+                  {r.ok ? <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-1"/> : <AlertTriangle className="w-4 h-4 text-amber-600 mt-1"/>}
+                  <div className="flex-1">
+                    <div className="text-xs text-gray-500">{r.input}</div>
+                    {r.ok ? (
+                      <div className="mt-1 text-sm">{r.result}</div>
+                    ) : (
+                      <div className="mt-1 text-sm text-amber-700">{r.reason}</div>
+                    )}
+                  </div>
+                  {r.ok && (
+                    <button onClick={()=>copy(r.result)} className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-1 rounded-lg border hover:bg-gray-50"><Copy className="w-3 h-3"/> Copy</button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {bulk && (
+              <div className="mt-3 flex gap-2">
+                <button onClick={()=>copy(bulkRows.rows.filter(r=>r.ok).map(r=>r.result).join("\n"))} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border hover:bg-gray-50"><Copy className="w-4 h-4"/> Copy all formatted</button>
+                <button onClick={()=>setBulk("")} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-gray-600 hover:bg-gray-50"><Trash2 className="w-4 h-4"/> Clear</button>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Learn by example */}
+        <section className="lg:col-span-2">
+          <div className="bg-white border rounded-2xl p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-3"><Search className="w-5 h-5"/><h2 className="font-semibold">Try these</h2></div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+              {[
+                'Buying Plantation business. Price: Negotiable.',
+                'selling house no 85',
+                'looking to buy car 1.7m',
+                'trading ubermacht m5 for grotti italia',
+                'renting out house no 1023 with garden and 5 gs 100k per week',
+                'selling monowheel type 2',
+                'selling luminous rims',
+              ].map((ex, i) => (
+                <button key={i} onClick={()=>setInput(ex)} className="text-left px-3 py-2 rounded-xl border hover:bg-gray-50">
+                  <span className="block text-gray-500">Raw:</span>
+                  <span className="block font-medium">{ex}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="max-w-5xl mx-auto px-4 pb-10 text-xs text-gray-500">
+        Built for Lifeinvader EN-03 policy. Update rule tables as policy evolves.
+      </footer>
+    </div>
+  );
+}
