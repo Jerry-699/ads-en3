@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lifeinvader EN-03 — Policy-Accurate Ad Formatter</title>
+<title>Lifeinvader EN-03 — Ad Builder (Form Mode)</title>
 <style>
   :root{
     --bg:#0b0c0f; --fg:#e7e8ea; --muted:#a8acb3; --card:#14161a; --accent:#6aa6ff; --ok:#3ecf8e; --warn:#ffb648; --bad:#ff5a7a; --chip:#1f2329;
@@ -13,11 +13,8 @@
     --bg:#f8fafc; --fg:#0f172a; --muted:#475569; --card:#ffffff; --accent:#2563eb; --ok:#10b981; --warn:#d97706; --bad:#e11d48; --chip:#eef2f7;
     --shadow:0 8px 24px rgba(15,23,42,.08);
   }
-  html,body{height:100%;}
-  body{
-    margin:0; font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,ui-monospace;
-    background:var(--bg); color:var(--fg);
-  }
+  html,body{height:100%}
+  body{margin:0; font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,ui-monospace; background:var(--bg); color:var(--fg)}
   .app{max-width:1140px; margin:0 auto; padding:16px}
   header{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
   .title{font-weight:800; letter-spacing:.2px; font-size:1.05rem}
@@ -26,39 +23,42 @@
   .toggle:before{content:""; position:absolute; width:22px; height:22px; border-radius:50%; top:3px; left:3px; background:var(--fg); transition:transform .2s ease}
   .toggle:checked{background:linear-gradient(90deg,var(--accent),#22d3ee)}
   .toggle:checked:before{transform:translateX(24px)}
-  .grid{display:grid; grid-template-columns:1.3fr .7fr; gap:14px}
-  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+  .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:14px}
+  @media (max-width:960px){ .grid{grid-template-columns:1fr} }
   .card{background:var(--card); border-radius:16px; padding:14px; box-shadow:var(--shadow); border:1px solid rgba(255,255,255,.06)}
   label{display:block; font-weight:700; margin-bottom:6px}
-  textarea,input{width:100%; border-radius:12px; border:1px solid rgba(127,127,127,.25); background:transparent; color:var(--fg); padding:12px; outline:none}
-  textarea{min-height:140px; resize:vertical}
   .row{display:flex; gap:10px; flex-wrap:wrap}
+  .muted{color:var(--muted); font-size:.92rem}
+  .pill{padding:8px 12px; border-radius:999px; background:var(--chip)}
   .btn{appearance:none; border:0; padding:12px 14px; border-radius:12px; color:#fff; background:var(--accent); font-weight:800; cursor:pointer; box-shadow:var(--shadow)}
   .btn.secondary{background:#7c8596}
   .btn.ghost{background:transparent; color:var(--fg); border:1px dashed rgba(127,127,127,.35)}
-  .muted{color:var(--muted); font-size:.92rem}
-  .output{font-family:ui-monospace,Menlo,Consolas,monospace; background:var(--chip); border-radius:12px; padding:12px; white-space:pre-wrap; word-break:break-word}
   .chips{display:flex; flex-wrap:wrap; gap:8px}
   .chip{background:var(--chip); padding:6px 10px; border-radius:999px; font-size:.82rem}
   .chip.ok{background: rgba(16,185,129,.12); color:var(--ok)}
   .chip.bad{background: rgba(225,29,72,.12); color:var(--bad)}
+  .output{font-family:ui-monospace,Menlo,Consolas,monospace; background:var(--chip); border-radius:12px; padding:12px; white-space:pre-wrap; word-break:break-word}
+  input, select{
+    width:100%; border-radius:12px; border:1px solid rgba(127,127,127,.25); background:transparent; color:var(--fg); padding:10px; outline:none
+  }
+  .grid2{display:grid; gap:10px; grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid3{display:grid; gap:10px; grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (max-width:720px){ .grid2,.grid3{grid-template-columns:1fr} }
+  fieldset{border:1px dashed rgba(127,127,127,.35); border-radius:12px; padding:10px}
+  legend{padding:0 6px; color:var(--muted); font-weight:600}
+  .inline{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .small{font-size:.86rem}
   .list{display:grid; gap:10px}
   .ad{border:1px solid rgba(127,127,127,.25); border-radius:14px; padding:12px; background:linear-gradient(180deg, rgba(255,255,255,.02), transparent)}
   .ad .hdr{display:flex; gap:10px; align-items:center; justify-content:space-between; margin-bottom:6px}
   .ad .cat{font-weight:800; padding:4px 8px; border-radius:8px; background:var(--chip)}
   .ad .text{white-space:pre-wrap}
-  .search-bar{display:flex; gap:8px}
-  .pill{padding:8px 12px; border-radius:999px; background:var(--chip)}
-  .warning{border-left:4px solid var(--warn); padding:8px 10px; background:rgba(217,119,6,.12); border-radius:10px; margin-top:8px}
-  .error{border-left:4px solid var(--bad); padding:8px 10px; background:rgba(225,29,72,.12); border-radius:10px; margin-top:8px}
-  .success{border-left:4px solid var(--ok); padding:8px 10px; background:rgba(16,185,129,.12); border-radius:10px; margin-top:8px}
-  .small{font-size:.86rem}
 </style>
 </head>
 <body data-theme="dark">
 <div class="app">
   <header>
-    <div class="title">Lifeinvader EN-03 • Policy-Accurate Ad Formatter</div>
+    <div class="title">Lifeinvader EN-03 • Form-Based Ad Builder</div>
     <div class="mode">
       <span class="pill small">Day / Night</span>
       <input id="themeToggle" class="toggle" type="checkbox" aria-label="Toggle theme" />
@@ -66,53 +66,177 @@
   </header>
 
   <div class="grid">
-    <!-- LEFT: Composer -->
+    <!-- LEFT: FORM BUILDER -->
     <section class="card">
-      <label for="raw">Raw ad text</label>
-      <textarea id="raw" placeholder='e.g., selling house no 85 // buyyingng a Ruby. Price: Negotiable. // trading "Ubermacht m5 e34" with turbo // Party at bahama mamas'></textarea>
+      <label>Create an ad</label>
+
+      <div class="grid3">
+        <div>
+          <div class="small muted">Category</div>
+          <select id="categorySel">
+            <option>Real Estate</option>
+            <option>Auto</option>
+            <option>Businesses</option>
+            <option>Work</option>
+            <option>Dating</option>
+            <option>Discounts</option>
+            <option>Services</option>
+            <option selected>Other</option>
+          </select>
+        </div>
+        <div>
+          <div class="small muted">Action</div>
+          <select id="actionSel">
+            <option>Selling</option>
+            <option>Buying</option>
+            <option>Trading</option>
+            <option>Selling or trading</option>
+            <option>Renting out</option>
+          </select>
+        </div>
+        <div>
+          <div class="small muted">Item / Name</div>
+          <input id="itemName" placeholder='e.g., "Ubermacht M5 (E34)" or house / pineapple / license plate (1ABC234)'>
+        </div>
+      </div>
+
+      <div class="grid3" style="margin-top:10px">
+        <div>
+          <div class="small muted">Quantity (optional)</div>
+          <input id="qty" type="number" min="1" placeholder="e.g., 2">
+        </div>
+        <div>
+          <div class="small muted">Money</div>
+          <input id="money" placeholder='e.g., 1.7k each, 10 Million, Negotiable'>
+        </div>
+        <div>
+          <div class="small muted">Money label (auto)</div>
+          <input id="moneyLabel" disabled value="Price:">
+        </div>
+      </div>
+
+      <!-- REAL ESTATE FIELDS -->
+      <fieldset id="reBlock" style="margin-top:12px; display:none">
+        <legend>Real Estate</legend>
+        <div class="grid3">
+          <div>
+            <div class="small muted">Property</div>
+            <select id="reType">
+              <option>house</option>
+              <option>apartment</option>
+              <option>penthouse</option>
+              <option>mansion</option>
+            </select>
+          </div>
+          <div>
+            <div class="small muted">Number (optional)</div>
+            <input id="reNum" placeholder="e.g., 758">
+          </div>
+          <div>
+            <div class="small muted">Location (optional)</div>
+            <input id="reLoc" placeholder="e.g., Vinewood Hills">
+          </div>
+        </div>
+        <div class="grid2" style="margin-top:8px">
+          <div class="inline">
+            <label class="small"><input type="checkbox" id="reGarden"> Garden</label>
+            <label class="small"><input type="checkbox" id="reCustom"> Custom interior</label>
+            <label class="small"><input type="checkbox" id="reIns"> Insurance</label>
+            <label class="small"><input type="checkbox" id="reHeli"> Helipad</label>
+          </div>
+          <div class="grid3">
+            <div>
+              <div class="small muted">Garage (g.s.)</div>
+              <select id="reGS">
+                <option value="">—</option>
+                <option>2 g.s.</option>
+                <option>5 g.s.</option>
+                <option>9 g.s.</option>
+                <option>25 g.s.</option>
+              </select>
+            </div>
+            <div>
+              <div class="small muted">Warehouses (w.h.)</div>
+              <input id="reWH" type="number" min="1" placeholder="e.g., 3">
+            </div>
+            <div>
+              <div class="small muted">Views/Other</div>
+              <input id="reOther" placeholder="e.g., swimming pool, nice views">
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- AUTO FIELDS -->
+      <fieldset id="autoBlock" style="margin-top:12px; display:none">
+        <legend>Auto</legend>
+        <div class="grid2">
+          <div>
+            <div class="small muted">Configuration</div>
+            <select id="autoCfg">
+              <option value="">None</option>
+              <option>with partial configuration</option>
+              <option>with full configuration</option>
+            </select>
+          </div>
+          <div class="inline" style="align-items:flex-end">
+            <label class="small"><input type="checkbox" id="autoVisual"> visual upgrades</label>
+            <label class="small"><input type="checkbox" id="autoLuminous"> luminous wheels</label>
+            <label class="small"><input type="checkbox" id="autoIns"> insurance</label>
+            <label class="small"><input type="checkbox" id="autoTurbo"> turbo kit</label>
+            <label class="small"><input type="checkbox" id="autoDrift"> drift kit</label>
+          </div>
+        </div>
+        <div class="small muted" style="margin-top:6px">Tip: Vehicle brand/model should be in quotes. Example: <b>"Ubermacht M5 (E34)"</b></div>
+      </fieldset>
+
+      <!-- WORK/DATING HINTS -->
+      <div id="datingHint" class="small muted" style="margin-top:8px; display:none">
+        Dating: use <b>Looking for Firstname Lastname</b> or allowed phrases. Don’t include Price/Budget.
+      </div>
+      <div id="workHint" class="small muted" style="margin-top:8px; display:none">
+        Work: use “Hiring …” or “Looking for work …”. Replace “level” with “years experience”.
+      </div>
 
       <div class="row" style="margin-top:10px">
-        <button id="formatBtn" class="btn">Generate formatted ad</button>
-        <button id="addBtn" class="btn secondary" title="Adds the last formatted ad to the list">Add to list</button>
+        <button id="genBtn" class="btn">Generate formatted ad</button>
+        <button id="addBtn" class="btn secondary">Add to list</button>
         <button id="clearBtn" class="btn ghost">Clear</button>
       </div>
 
-      <div id="alerts"></div>
+      <div id="alerts" style="margin-top:8px"></div>
 
       <div style="margin-top:12px">
         <label>Formatted output</label>
         <div id="out" class="output" role="status" aria-live="polite"></div>
-      </div>
-
-      <div class="warning small" style="margin-top:10px">
-        This tool follows your EN-03 policy: opener words, Price/Budget/Rent, money format, Real Estate features, Vehicle rules, Dating checks, Business terminology, Beach Market, parties allowlist, containers/resources/tuning, blacklist, and rejection reasons.
+        <div class="row" style="margin-top:8px">
+          <button id="copyBtn" class="btn ghost small">Copy output</button>
+        </div>
       </div>
     </section>
 
-    <!-- RIGHT: Metadata -->
+    <!-- RIGHT: META + LIST -->
     <aside class="card">
       <label>Detected category</label>
-      <div id="category" class="chips" style="margin-bottom:8px"><span class="chip">—</span></div>
+      <div id="categoryChip" class="chips"><span class="chip">—</span></div>
 
-      <label>Checks</label>
+      <label style="margin-top:8px">Checks</label>
       <div id="checks" class="chips"></div>
 
-      <div style="margin-top:12px">
-        <label>Search ads</label>
-        <div class="search-bar">
-          <input id="search" placeholder="Search formatted list…" />
+      <div class="row" style="margin-top:12px; justify-content:space-between">
+        <div class="inline">
+          <input id="search" placeholder="Search ads…" style="width:220px">
           <button id="searchBtn" class="btn">Search</button>
         </div>
+        <button id="exportBtn" class="btn ghost small">Export JSON</button>
       </div>
 
-      <div class="row" style="margin-top:12px; justify-content:space-between">
-        <button id="exportBtn" class="btn ghost small">Export JSON</button>
-        <button id="copyBtn" class="btn ghost small">Copy output</button>
+      <div class="warning" style="margin-top:12px">
+        Blacklist enforced (firearms, drugs, covid masks, scanners, balaclavas, etc.). Rejections include: multi-vehicle ads, >3 items in Other, improper ad, template not found, missing rental period, etc.
       </div>
     </aside>
   </div>
 
-  <!-- Ads list -->
   <section class="card" style="margin-top:14px">
     <div class="row" style="justify-content:space-between; align-items:center">
       <label>Generated ads</label>
@@ -124,484 +248,286 @@
 <script>
 (function(){
   const $ = id => document.getElementById(id);
-  const raw = $('raw'), out = $('out'), catChip = $('category'), checks = $('checks'), alerts = $('alerts'), list = $('list');
-  const themeToggle = $('themeToggle'), search = $('search');
+  const els = {
+    theme: $('themeToggle'),
+    categorySel: $('categorySel'),
+    actionSel: $('actionSel'),
+    itemName: $('itemName'),
+    qty: $('qty'),
+    money: $('money'),
+    moneyLabel: $('moneyLabel'),
+    reBlock: $('reBlock'), reType: $('reType'), reNum: $('reNum'), reLoc: $('reLoc'),
+    reGarden: $('reGarden'), reCustom: $('reCustom'), reIns: $('reIns'), reHeli: $('reHeli'),
+    reGS: $('reGS'), reWH: $('reWH'), reOther: $('reOther'),
+    autoBlock: $('autoBlock'), autoCfg: $('autoCfg'), autoVisual: $('autoVisual'),
+    autoLuminous: $('autoLuminous'), autoIns: $('autoIns'), autoTurbo: $('autoTurbo'), autoDrift: $('autoDrift'),
+    datingHint: $('datingHint'), workHint: $('workHint'),
+    genBtn: $('genBtn'), addBtn: $('addBtn'), clearBtn: $('clearBtn'),
+    out: $('out'), alerts: $('alerts'), categoryChip: $('categoryChip'), checks: $('checks'),
+    search: $('search'), searchBtn: $('searchBtn'), exportBtn: $('exportBtn'), list: $('list'),
+    copyBtn: $('copyBtn'),
+  };
 
   // Theme
   const savedTheme = localStorage.getItem('theme') || 'dark';
   document.body.setAttribute('data-theme', savedTheme);
-  themeToggle.checked = savedTheme === 'light';
-  themeToggle.addEventListener('change', () => {
-    document.body.setAttribute('data-theme', themeToggle.checked ? 'light' : 'dark');
-    localStorage.setItem('theme', themeToggle.checked ? 'light' : 'dark');
+  els.theme.checked = savedTheme === 'light';
+  els.theme.addEventListener('change', () => {
+    const val = els.theme.checked ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', val);
+    localStorage.setItem('theme', val);
   });
 
-  // Utilities
-  const escapeHtml = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[c]));
-  const titleCaseFirst = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+  // Helpers
+  const escapeHtml = s => (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[c]));
+  const titleCaseFirst = s => s ? s[0].toUpperCase()+s.slice(1) : s;
   const lc = s => (s||'').toLowerCase();
-
-  // Money helpers
   const dotsThousands = n => String(Math.trunc(Math.abs(Number(n)))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+
   function normalizeMoney(str){
-    // Convert k/M shortcuts to policy, enforce $, dot-thousands, "Million", no trailing K/M
-    return str
-      // k / M suffixes
+    if (!str) return '';
+    return String(str)
       .replace(/\$?\s*([\d.,]+)\s*([kKmM])\b/g, (_, num, suf) => {
         const val = parseFloat(String(num).replace(/,/g,'.'));
         if (!isFinite(val)) return `$${num}`;
         if (suf.toLowerCase()==='k') return `$${dotsThousands(Math.round(val*1000))}`;
-        // M → Million
         return `$${val % 1 === 0 ? val.toFixed(0) : String(val)} Million`;
       })
-      // plain numbers to $X with dot thousands (avoid touching things already like "Million")
       .replace(/\$?\s*(\d{1,3}(?:[,.]\d{3})+|\d+)(?!\s*Million)\b/g, (_,num)=>{
         const clean = String(num).replace(/,/g,'');
         if (!/^\d+(\.\d+)?$/.test(clean)) return `$${num}`;
         return `$${dotsThousands(clean)}`;
       })
-      // Negotiable cap
       .replace(/\bnegotiable\b/gi,'Negotiable');
   }
 
-  // Blacklist (full per policy)
+  // Blacklist (key terms)
   const BLACKLIST = new Set([
     'firearm','firearms','gun','guns','weapon','weapons','pistol','rifle','shotgun','ammo','ammunition',
-    'bulletproof vest','bulletproof vests','armor plates','armor plate','armor','plate carrier',
-    'weed','cannabis','cannabis seeds','weed seeds','trees','drug','drugs','cocaine',
+    'bulletproof vest','bulletproof vests','armor plates','armor plate','armor',
+    'weed','cannabis','cannabis seeds','weed seeds','drug','drugs','cocaine',
     'ems surgical mask','surgical mask','medical mask','covid mask','ems mask',
     'vehicle scanner','human scanner','resource scanner','scanner','radar','anti-radar',
     'balaclava','balaclava mask','bandit mask',
     'rope','ropes','head bag','head bags',
-    'usb with virus','virus usb',
+    'usb with virus',
     'lock pick','lock picks','lockpick','lockpicks','crowbar','crowbars',
-    'troll','trolling',
-    'animal skin',
-    'satellite dish','barricade','engine block','air horn'
+    'animal skin','satellite dish','barricade','engine block','air horn'
   ]);
 
-  // Rejection reasons list (subset + key ones)
-  const REASONS = {
-    multiVehicles: 'Cannot advertise more than 1 vehicle at a time.',
-    multiItemsOther: 'Cannot advertise more than 3 items at a time.',
-    illegalItems: 'Cannot promote illegal items.',
-    improper: 'Improper ad.',
-    templateMissing: 'Template not found. Contact LI to create a template.',
-    personNotFound: 'Person not found in database. (Person must be in the GRAND RP mail)',
-    classifiedPerson: 'You cannot look for classified person.',
-    itemNotFound: 'Item not found in database.',
-    insufficientItem: 'Please, provide the correct name of the item you are selling.',
-    insufficientItemBuy: 'Please, provide the correct name of the item you are buying.',
-    badLicense: 'It is forbidden to publish license plates containing offensive language.',
-    rentalPeriodMissing: 'Please indicate rental period.'
-  };
-
-  // Categories & signals
-  const OFFICIAL_PLACES = [
-    'Vinewood Hills','Rockford Hills','Richman','Sandy Shores','Paleto Bay','Postal','Hospital','Capitol','Fire Station','Auto Fair',
-    'Bahama Mamas Bar','Tequi-la-la Bar','FIB','Hotel Spa Bar','Pacific Bluffs Country Club','Diamond Resort Bar','Vanilla Unicorn Bar',
-    'Church','Stock Exchange','Stadium','Chumash','Lifeinvader','Del Perro Pier','Del Perro Beach','Cayo Perico Island','Hotel','Raton Canyon','School','SAHP'
-  ];
-  const UNOFFICIAL_PLACES = ['airport','autosalon','beach','beach market','ghetto','post office','train station','yacht'];
-
-  function capitalizeOfficialPlaces(text){
-    // Capitalize official, lower unofficial occurrences
-    OFFICIAL_PLACES.forEach(p=>{
-      const re = new RegExp(p.replace(/[()]/g,'\\$&'), 'ig');
-      text = text.replace(re, p);
-    });
-    UNOFFICIAL_PLACES.forEach(p=>{
-      const re = new RegExp(`\\b${p}\\b`, 'ig');
-      text = text.replace(re, p.toLowerCase());
-    });
-    return text;
-  }
-
-  // Vehicle formatting helpers
-  function quoteVehicleNames(s){
-    // Ensure "Brand Model (Code)" is quoted; also normalize capitalization for examples like Ubermacht m5 e34
-    return s.replace(/\b([A-Z][a-zA-Z]+)\s+([A-Za-z0-9\-]+(?:\s*\([^)]+\))?)\b(?!")/g,(m,brand,rest)=>{
-      // avoid quoting common nouns
-      const block = ['Selling','Buying','Trading','Selling or trading','Price','Budget','Rent','with','and','or','for','at','auto','car','cars','vehicle','vehicles'];
-      if (block.includes(brand)) return m;
-      // heuristic: if word is clearly a brand-like and followed by model, quote
-      return `"${brand} ${rest.replace(/\s+/g,' ').replace(/\b([a-z])(\d)/g,(m,a,b)=>a.toUpperCase()+b)}"`;
-    });
-  }
-  function mapVehicleUpgrades(s){
-    // normalize config/visuals/turbo/drift order & phrases
-    s = s
-      .replace(/\b(max config|max tuning|fully upgraded)\b/ig,'with full configuration')
-      .replace(/\b(nearly max|part\s*lvl\s*3|part lvl3|lvl3|partial config|some config|some tuning|chip tuning)\b/ig,'with partial configuration')
-      .replace(/\b(body upgrades|body kit)\b/ig,'with visual upgrades')
-      .replace(/\b(turbo)\b/ig,'turbo kit')
-      .replace(/\b(drift (?:tuning|assistance))\b/ig,'drift kit')
-      .replace(/\b(luminous (?:rims|unique wheels|unique rims|wheels))\b/ig,'luminous wheels');
-    // enforce order after vehicle name
-    s = s.replace(/"([^"]+)"([^\.]*?)\./g,(m,name,tail)=>{
-      const bits = [];
-      if (/with full configuration/i.test(tail)) bits.push('with full configuration');
-      else if (/with partial configuration/i.test(tail)) bits.push('with partial configuration');
-      if (/visual upgrades/i.test(tail)) bits.push('visual upgrades');
-      if (/luminous wheels/i.test(tail)) bits.push('luminous wheels');
-      if (/insurance/i.test(tail)) bits.push('insurance');
-      if (/turbo kit/i.test(tail)) bits.push('turbo kit');
-      if (/drift kit/i.test(tail)) bits.push('drift kit');
-      const joined = bits.length ? ' ' + (bits[0].startsWith('with') ? bits[0] : 'with ' + bits[0]) + (bits.slice(1).length ? ', ' + bits.slice(1).join(', ') : '') : '';
-      return `"${name}"${joined}.`;
-    });
-    return s;
-  }
-
-  // Real Estate helpers
-  function normalizeRealEstateObject(obj){
-    // number sign
-    obj = obj.replace(/\b(house|apartment|penthouse|mansion)\s*(?:#|no\.?|number)?\s*(\d+)\b/ig,(m,t,n)=> `${t} №${n}`);
-    // Casino apartment → Casino penthouse
-    obj = obj.replace(/\bCasino apartment\b/ig,'Casino penthouse');
-    // add article when number is absent
-    if (/^(house|apartment|penthouse|mansion)\b(?!\s*№)/i.test(obj)) {
-      obj = obj.replace(/^(house|apartment|penthouse|mansion)\b/i,(w)=> (/^[aeiou]/i.test(w)?'an ':'a ')+w);
-    }
-    return obj;
-  }
-  function orderRealEstateFeatures(txt){
-    // collect features and reorder per policy
-    const features = {
-      garden: /(?:^|[\s,])garden\b/i.test(txt),
-      gs_2: /\b2 g\.s\./i.test(txt),
-      gs_5: /\b5 g\.s\./i.test(txt),
-      gs_9: /\b9 g\.s\./i.test(txt),
-      gs_25:/\b25 g\.s\./i.test(txt),
-      wh: /\b(\d+)\s*w\.h\./i.exec(txt),
-      custom: /custom interior/i.test(txt),
-      insurance: /insurance/i.test(txt),
-      helipad: /helipad/i.test(txt),
-      others: []
-    };
-    if (/swimming pool/i.test(txt)) features.others.push('swimming pool');
-    if (/(?:long|large) driveway/i.test(txt)) features.others.push('long driveway');
-    if (/(?:spacious )?backyard/i.test(txt)) features.others.push('spacious backyard');
-    if (/(?:nice|beautiful|great) views?/i.test(txt)) features.others.push('nice views');
-    // build ordered string
-    const parts = [];
-    if (features.garden) parts.push('a garden');
-    if (features.gs_2) parts.push('2 g.s.');
-    if (features.gs_5) parts.push('5 g.s.');
-    if (features.gs_9) parts.push('9 g.s.');
-    if (features.gs_25) parts.push('25 g.s.');
-    if (features.wh) parts.push(`${features.wh[1]} w.h.`);
-    if (features.custom) parts.push('custom interior');
-    if (features.insurance) parts.push('insurance');
-    if (features.helipad) parts.push('helipad');
-    parts.push(...features.others);
-    if (!parts.length) return null;
-    // commas, "and" before last, trailing period handled later
-    return parts.length===1 ? parts[0] : parts.slice(0,-1).join(', ') + ' and ' + parts.slice(-1);
-  }
-
-  // Category detection (broad)
+  // Category detection
   const CATS = {
-    "Real Estate": ['house','apartment','penthouse','mansion','g.s.','w.h.','helipad','garden','mirror park','vinewood','view','lifeinvader','casino penthouse'],
-    "Auto": ['car','truck','motorcycle','bike','atv','boat','helicopter','plane','vehicle','insurance','drift kit','turbo kit','configuration','luminous wheels','auto fair','monowheel'],
-    "Businesses": [
-      'ammunition store','bar','car wash','chip tuning','clothing shop','cowshed','electric station','farm','flower shop','freight train','gas station','hair salon','jewelry store','oil well','parking','plantation','car sharing','state object','service station','24/7 store','tattoo studio','taxi company','atm','juice shop','burger shop','warehouse','grand elite'
-    ],
-    "Work": ['hiring','looking for work','looking for a job','salary','awarding','driver','lawyer','dj','photographer','bodyguard','assistant','professional dancer','professional singer','trucker','experience','construction site'],
-    "Dating": ['looking for a','looking for','looking for friend','boyfriend','girlfriend','wife','husband','valentine','family','friends','casino poker players'],
-    "Discounts": ['% discount','% off','off on all','offering','discount '],
-    "Services": ['happy hour','template','join us','office','are you new in town','look no further','call us'],
-    "Other": ['party','car meet','dice','fish','fishing rod','fruits','vegetables','mask','video card','repair kit','token','thread','snow','ticket','license plate','luminous wheels of type','pickaxe','tuning','elixir','pet','container','battery','fuel','wires','prime','prime platinum','sim card','lottery','resource','miner','inventory','backpack skin','tonic','pearl','statue','drawing','mushroom','paint can','timber','scrap metal','top quality metal','leash','hookah','charger','milk']
+    "Real Estate": ['house','apartment','penthouse','mansion','g.s.','w.h.','helipad','garden','view','vinewood','mirror park','lifeinvader'],
+    "Auto": ['"','vehicle','car ','truck','motorcycle','bike','atv','boat','helicopter','plane','monowheel','drift kit','turbo kit','configuration','luminous wheels','auto fair'],
+    "Businesses": ['ammunition store','bar','car wash','chip tuning','clothing shop','cowshed','electric station','farm','flower shop','freight train','gas station','hair salon','jewelry store','oil well','parking','plantation','car sharing','state object','service station','24/7 store','tattoo studio','taxi company','atm','juice shop','burger shop','warehouse'],
+    "Work": ['hiring','looking for work','looking for a job','salary','awarding','driver','lawyer','dj','photographer','bodyguard','assistant','professional dancer','professional singer','trucker','construction site'],
+    "Dating": ['looking for '],
+    "Discounts": ['% discount','% off','offering','discount '],
+    "Services": ['happy hour','template','join us','office'],
+    "Other": ['party','dice','fish','fishing rod','fruits','vegetables','mask','video card','repair kit','token','thread','snow','ticket','license plate','pickaxe','tuning','elixir','pet','container','battery','fuel','wires','prime','prime platinum','sim card','lottery','miner','inventory','backpack skin','tonic','pearl','statue','drawing','mushroom','paint can','timber','scrap metal','top quality metal','leash','hookah','charger','milk','luminous wheels of type']
   };
-
-  function detectCategory(text){
+  const detectCategory = text => {
     const s = lc(text);
     for (const [k, arr] of Object.entries(CATS)){
       if (arr.some(w => s.includes(w))) return k;
     }
     return 'Other';
+  };
+
+  // Official/unofficial place casing
+  const OFFICIAL = ['Vinewood Hills','Rockford Hills','Richman','Sandy Shores','Paleto Bay','Postal','Hospital','Capitol','Fire Station','Auto Fair','Bahama Mamas Bar','Tequi-la-la Bar','FIB','Hotel Spa Bar','Pacific Bluffs Country Club','Diamond Resort Bar','Vanilla Unicorn Bar','Church','Stock Exchange','Stadium','Chumash','Lifeinvader','Del Perro Pier','Del Perro Beach','Cayo Perico Island','Hotel','Raton Canyon','School','SAHP'];
+  const UNOFFICIAL = ['airport','autosalon','beach','beach market','ghetto','post office','train station','yacht'];
+  function fixPlaceCase(text){
+    OFFICIAL.forEach(p=>{ text = text.replace(new RegExp(p.replace(/[()]/g,'\\$&'), 'ig'), p); });
+    UNOFFICIAL.forEach(p=>{ text = text.replace(new RegExp(`\\b${p}\\b`,'ig'), p.toLowerCase()); });
+    return text;
   }
 
-  // Opener detection/normalization + label
-  function detectOpener(s){
-    const S = lc(s);
-    if (/\bselling or trading\b/.test(S)) return 'Selling or trading';
-    if (/\btrading\b/.test(S)) return 'Trading';
-    if (/\bselling\b/.test(S)) return 'Selling';
-    if (/\brenting out\b/.test(S)) return 'Renting out';
-    if (/\brenting\b/.test(S)) return 'Renting';
-    if (/\bbuying\b/.test(S) || /looking to (?:buy|purchase)/i.test(s) || /\blooking for\b/i.test(s)) return 'Buying';
-    return null;
+  // Real Estate builders
+  function buildRealEstateObject(){
+    const t = els.reType.value; // house/apartment/...
+    const num = (els.reNum.value||'').trim();
+    const loc = (els.reLoc.value||'').trim();
+    let obj = t;
+    if (num) obj += ` №${num}`;
+    else obj = (/^[aeiou]/i.test(t)?'an ':'a ') + obj;
+    const feats = [];
+    if (els.reGarden.checked) feats.push('a garden');
+    if (els.reGS.value) feats.push(els.reGS.value);
+    if (els.reWH.value) feats.push(`${els.reWH.value} w.h.`);
+    if (els.reCustom.checked) feats.push('custom interior');
+    if (els.reIns.checked) feats.push('insurance');
+    if (els.reHeli.checked) feats.push('helipad');
+    if (els.reOther.value.trim()){
+      // split commas, normalize phrasing
+      els.reOther.value.split(',').map(s=>s.trim()).filter(Boolean).forEach(x=>feats.push(x));
+    }
+    if (feats.length){
+      const tail = feats.length===1 ? feats[0] : feats.slice(0,-1).join(', ') + ' and ' + feats.slice(-1);
+      obj += ` with ${tail}`;
+    }
+    if (loc) obj += ` in ${loc}`;
+    return obj;
   }
 
-  // Typos & canonical replacements
-  function fixTypos(s){
-    return s
-      .replace(/buyyingng|buyying|buyyy?ing|buyin\b|looking to (?:buy|purchase)|look(?:ing)? to (?:buy|purchase)/gi,'Buying')
-      .replace(/selling or trading|sell(?:ing)? ?\/ ?trading|s\/t/gi,'Selling or trading')
-      .replace(/\btrad(?:e|ing)\b/gi,'Trading')
-      .replace(/\brent(?:ing)? out\b/gi,'Renting out')
-      .replace(/\brent(?:ing)?\b/gi,'Renting')
-      .replace(/\bcasino apartment\b/gi,'Casino penthouse')
-      // vehicle upgrade lexicon
-      .replace(/\bmax config|max tuning|fully upgraded\b/gi,'with full configuration')
-      .replace(/\bnearly max|part\s*lvl\s*3|lvl\s*3|partial config|some config|chip tuning\b/gi,'with partial configuration')
-      .replace(/\bbody upgrades|body kit\b/gi,'with visual upgrades')
-      .replace(/\bturbo\b/gi,'turbo kit')
-      .replace(/\bdrift (?:tuning|assistance)\b/gi,'drift kit')
-      .replace(/\bluminous (?:rims|unique wheels|unique rims|wheels)\b/gi,'luminous wheels')
-      // terms to "type"
-      .replace(/\bextras\b/gi,'of type')
-      ;
+  // Auto builders
+  function buildAutoTail(){
+    const bits = [];
+    if (els.autoCfg.value) bits.push(els.autoCfg.value);
+    if (els.autoVisual.checked) bits.push('visual upgrades');
+    if (els.autoLuminous.checked) bits.push('luminous wheels');
+    if (els.autoIns.checked) bits.push('insurance');
+    if (els.autoTurbo.checked) bits.push('turbo kit');
+    if (els.autoDrift.checked) bits.push('drift kit');
+    if (!bits.length) return '';
+    return ' ' + (bits[0].startsWith('with')? bits[0] : 'with '+bits[0]) + (bits.slice(1).length? ', '+bits.slice(1).join(', ') : '');
   }
 
-  // Money line build
-  function moneyLineFor(opener, existing){
-    if (opener === 'Renting out') return existing || 'Rent: Negotiable.';
-    if (opener === 'Buying') return existing || 'Budget: Negotiable.';
-    if (opener === 'Trading') return existing || ''; // can be empty
-    if (opener === 'Selling or trading' || opener === 'Selling') return existing || 'Price: Negotiable.';
-    return existing || '';
-  }
-
-  function extractMoneySentence(s){
-    const m = /(Price|Budget|Rent)\s*:?\s*([^.]*)/i.exec(s);
-    if (!m) return null;
-    let label = titleCaseFirst(m[1].toLowerCase());
-    let rest = m[2].trim();
-    if (!rest) rest = 'Negotiable';
-    rest = normalizeMoney(rest);
-    // If ends with number (not Million word), omit trailing period
-    const tail = /\d(?:\.\d{3})*(?!.*Million$)/.test(rest) ? '' : '.';
-    return `${label}: ${rest}${tail}`;
-  }
-
-  function endsWithNumberSentence(s){
-    return /\d$/.test(s.trim());
-  }
-
-  // License plate simple validity (length 3-7 when provided)
+  // License plate quick check
   function validLicensePlate(s){
-    const m = /\blicense plate\s*\(([^)]+)\)/i.exec(s);
+    const m = /\blicense plate\s*\(([^)]+)\)/i.exec(s||'');
     if (!m) return true;
     const val = m[1].trim();
     return val.length>=3 && val.length<=7;
   }
 
-  // Party location allowlist (for "Other")
-  const PARTY_OK = new Set([
-    'house','apartment','beach','yacht','bahama mamas bar','tequi-la-la bar','stadium','diamond resort bar','arena','raton canyon','vanilla unicorn bar','hotel spa bar'
-  ]);
-
-  function validatePartyLocation(s, problems){
-    const m = /\bparty at (.+?)\.?$/i.exec(s);
-    if (!m) return;
-    const place = lc(m[1]).replace(/\s+market.*$/,'').trim();
-    if (!Array.from(PARTY_OK).some(x => place.includes(x))) {
-      problems.push({type:'warning', msg:'Party location may be disallowed per list of places we don’t promote.'});
-    }
+  // Money label auto
+  function updateMoneyLabel(){
+    const act = els.actionSel.value;
+    if (act==='Buying') els.moneyLabel.value = 'Budget:';
+    else if (act==='Renting out') els.moneyLabel.value = 'Rent:';
+    else if (act==='Trading') els.moneyLabel.value = ''; // optional
+    else els.moneyLabel.value = 'Price:';
   }
 
-  // Dating validation: require First + Last; capitalize; cannot set price/budget
-  function normalizeDating(s, problems){
-    if (!/^looking for/i.test(s.trim())) return s;
-    // "Looking for Name Surname."
-    const nameMatch = /looking for\s+([a-z]+)\s+([a-z]+)\b/i.exec(s);
-    if (nameMatch){
-      const full = `${titleCaseFirst(nameMatch[1])} ${titleCaseFirst(nameMatch[2])}`;
-      s = s.replace(nameMatch[0], `Looking for ${full}`);
-    } else if (/looking for a (wife|husband|boyfriend|girlfriend|friend|family( members)?|valentine)/i.test(s)) {
-      s = s.replace(/^looking for/i,'Looking for');
+  // Show/hide blocks based on category
+  function updateBlocks(){
+    const cat = els.categorySel.value;
+    els.reBlock.style.display = (cat==='Real Estate') ? '' : 'none';
+    els.autoBlock.style.display = (cat==='Auto') ? '' : 'none';
+    els.datingHint.style.display = (cat==='Dating') ? '' : 'none';
+    els.workHint.style.display = (cat==='Work') ? '' : 'none';
+  }
+
+  // Build ad from form fields
+  function buildAd(){
+    // Blacklist from item name
+    const raw = [els.itemName.value, els.reOther.value, els.reLoc.value].join(' ').toLowerCase();
+    for (const bad of BLACKLIST){ if (raw.includes(bad)) return {formatted:'', category:'—', problems:[{type:'error', msg:`Rejected: contains blacklisted term: ${bad}`}]}; }
+
+    const cat = els.categorySel.value;
+    let action = els.actionSel.value;
+    let name = (els.itemName.value||'').trim();
+
+    // Real Estate object builder overrides "name"
+    if (cat==='Real Estate'){
+      name = buildRealEstateObject();
+      // apartments cannot be “with insurance”
+      if (/apartment №\d+.*insurance/i.test(name)){
+        return {formatted:'', category:cat, problems:[{type:'error', msg:'Apartments cannot be insured.'}]};
+      }
+    }
+
+    // Auto: ensure quotes around brand model if looks like a vehicle name
+    if (cat==='Auto' && name && !/^".*"$/.test(name) && /\b[A-Za-z]+\s+[A-Za-z0-9]/.test(name)){
+      name = `"${name}"`;
+    }
+    if (cat==='Auto') {
+      name = name + buildAutoTail();
+    }
+
+    // If user chose Real Estate but left number empty, we already added article “a/an”
+    // If chose Real Estate with number, we already formatted as №N
+
+    // Quantity prefix
+    const qty = Number(els.qty.value||'');
+    let subject = action;
+    if (qty && qty>1 && cat!=='Real Estate') {
+      // pluralize crudely by adding "s" (policy examples accept “Selling 2 Drawings.”, “Selling 10 batteries.”)
+      subject += ' ' + qty + ' ' + (name.replace(/^a |an /i,'').trim());
     } else {
-      problems.push({type:'error', msg:'Please provide full first and last name for the person you are looking for.'});
+      subject += ' ' + name;
     }
-    if (/Price:|Budget:/i.test(s)) problems.push({type:'error', msg:'Looking/Dating ads must not include Price or Budget values.'});
-    return s;
-  }
+    subject = subject.replace(/\s+\.$/,'').trim();
+    subject = titleCaseFirst(subject);
+    if (!/\d$/.test(subject)) subject = subject.replace(/\.*$/,'') + '.';
 
-  // Business name normalization
-  function normalizeBusinessTerms(s){
-    return s
-      .replace(/\bgun store|weapon store\b/ig,'Ammunition Store')
-      .replace(/\bbarber\b/ig,'Hair salon')
-      .replace(/\bcharging station\b/ig,'Electric station')
-      .replace(/\bservice station(?: \(auto workshop\))?/ig,'Service station')
-      .replace(/\bdrug lab\b/ig,'Burger shop')
-      .replace(/\bpersonal business\b/ig,'private business');
-  }
-
-  // Beach Market phrasing
-  function normalizeBeachMarket(s){
-    // change "cheap prices" -> "for good prices"
-    s = s.replace(/\bcheap prices?\b/ig,'for good prices');
-    return s;
-  }
-
-  function enforceVehicleTradingParity(s, problems){
-    // Vehicle↔Vehicle, Business↔Business, Other↔Other checks (basic)
-    if (/trading/i.test(s)) {
-      // find “for” pattern
-      if (/trading\b.+\bfor\b/i.test(s)){
-        const leftAuto = /"(?:[^"]+)"|car|vehicle|bike|boat|helicopter|plane|monowheel/i.test(s);
-        const rightAuto = /\bfor\b.+(?:"[^"]+"|car|vehicle|bike|boat|helicopter|plane|monowheel)/i.test(s);
-        if (leftAuto && !rightAuto) problems.push({type:'error', msg:'Can only trade a Vehicle for another Vehicle.'});
+    // Money line
+    let moneyRaw = (els.money.value||'').trim();
+    let mlabel = els.moneyLabel.value;
+    let mline = '';
+    if (mlabel){ // Price/Budget/Rent
+      if (!moneyRaw || /negotiable/i.test(moneyRaw)) mline = `${mlabel} Negotiable.`;
+      else {
+        const norm = normalizeMoney(moneyRaw);
+        // if ends with pure number, omit final dot
+        const endsNum = /\d$/.test(norm) && !/\bMillion\b/.test(norm);
+        mline = `${mlabel} ${norm}${endsNum?'':'.'}`;
+      }
+    } else {
+      // Trading: optional. If provided, normalize with "Price:" by policy examples (can include “Price: Negotiable.”)
+      if (moneyRaw){
+        const norm = normalizeMoney(moneyRaw);
+        const endsNum = /\d$/.test(norm) && !/\bMillion\b/.test(norm);
+        mline = `Price: ${norm}${endsNum?'':'.'}`;
       }
     }
-  }
 
-  function periodRule(sentence){
-    // If ad ends with a number → no dot; else add dot
-    sentence = sentence.trim();
-    if (endsWithNumberSentence(sentence)) return sentence;
-    if (!/[.]$/.test(sentence)) sentence += '.';
-    return sentence;
-  }
+    // Special policy bits
+    // “Casino apartment” -> “Casino penthouse” already not selectable; but if typed in itemName:
+    subject = subject.replace(/\bCasino apartment\b/ig,'Casino penthouse');
 
-  // Formatting pipeline
-  function formatAd(input){
-    alerts.innerHTML = '';
+    // Official/unofficial places casing
+    subject = fixPlaceCase(subject);
+
+    // House № rule already handled; also add “a/an” if no number already handled by builder
+
+    // License plate length (if present)
+    const preview = [subject, mline].filter(Boolean).join(' ').trim();
     const problems = [];
-
-    if (!input || !input.trim()) return {formatted:'', category:'—', problems};
-
-    // 0) quick blacklist scan (raw)
-    {
-      const s = lc(input);
-      for (const bad of BLACKLIST) if (s.includes(bad)) {
-        problems.push({type:'error', msg:`Rejected: contains blacklisted term: ${bad}`});
-      }
-    }
-
-    // 1) normalize text / terms
-    let s = fixTypos(input);
-    s = normalizeBusinessTerms(s);
-    s = normalizeBeachMarket(s);
-    s = capitalizeOfficialPlaces(s);
-
-    // 2) detect opener; default to Selling
-    let opener = detectOpener(s) || 'Selling';
-
-    // 3) normalize object phrase (incl. real estate & vehicles quoting)
-    // a) for real estate
-    s = s.replace(/\b(house|apartment|penthouse|mansion)\b[^.]*\b/gi,(m)=> normalizeRealEstateObject(m));
-    // b) vehicles
-    s = quoteVehicleNames(s);
-    s = mapVehicleUpgrades(s);
-
-    // 4) dating normalization & checks
-    if (/^looking for/i.test(s.trim())) {
-      opener = 'Buying'; // policy maps “Looking to buy” to Buying, but “Looking for …” is Dating category; do not change opener word here; we format as “Looking for ….”
-      s = normalizeDating(s, problems);
-    }
-
-    // 5) Build first sentence: must begin with the opener (capitalized)
-    // extract a core object phrase after opener if present; otherwise keep opener + generic
-    let firstSentence;
-    {
-      // normalize “Looking to buy/purchase” already mapped to Buying earlier
-      const m = new RegExp(`\\b(${['Selling or trading','Selling','Trading','Buying','Renting out','Renting','Looking for'].join('|')})\\b\\s*([^.]*)`,'i').exec(s);
-      let obj = m ? (m[2]||'').trim() : '';
-      // trim trailing "Price/Budget/Rent" segments from obj for clarity
-      obj = obj.replace(/\s*(Price|Budget|Rent)\s*:.*$/i,'').trim();
-
-      // glue first sentence
-      let openerOut = opener;
-      if (/^looking for/i.test(s.trim())) openerOut = 'Looking for'; // preserve exact wording for Dating
-      firstSentence = openerOut + (obj ? ' ' + obj : (opener==='Buying'?' a car':' a house'));
-      firstSentence = firstSentence.replace(/\s+\.$/,'');
-      firstSentence = titleCaseFirst(firstSentence);
-      firstSentence = periodRule(firstSentence);
-    }
-
-    // 6) Money sentence (normalize existing or add default)
-    let mline = extractMoneySentence(s);
-    mline = moneyLineFor(opener, mline);
-
-    // 7) Category
-    let formattedPreview = [firstSentence, mline].filter(Boolean).join(' ');
-    let category = detectCategory(formattedPreview);
-
-    // 8) Category-specific rules & extra validations
-
-    // Auto: one vehicle per ad unless trading
-    if (category==='Auto'){
-      const quotedVehicles = (formattedPreview.match(/"[^"]+"/g)||[]);
-      const isTrading = /\btrading\b/i.test(formattedPreview) || /\bselling or trading\b/i.test(formattedPreview);
-      if (!isTrading && quotedVehicles.length>1) problems.push({type:'error', msg:REASONS.multiVehicles});
-      enforceVehicleTradingParity(formattedPreview, problems);
-    }
-
-    // Other: max 3 items
-    if (category==='Other'){
-      const itemsCount = (formattedPreview.match(/(?:Selling|Buying)\s+[^.]+?\./gi)||[]).length || 1;
-      if (itemsCount>3) problems.push({type:'error', msg:REASONS.multiItemsOther});
-      // party validation hint
-      validatePartyLocation(firstSentence, problems);
-    }
-
-    // Real Estate: order features
-    if (category==='Real Estate'){
-      // build ordered features line if features exist and inject into first sentence “with …”
-      const feats = orderRealEstateFeatures(firstSentence);
-      if (feats && !/ with /.test(firstSentence)){
-        firstSentence = firstSentence.replace(/\.$/,'') + ' with ' + feats + '.';
-      }
-      // apartments cannot be insured (ensure we didn't add it)
-      if (/apartment №\d+.*insurance/i.test(firstSentence)){
-        problems.push({type:'warning', msg:'Apartments cannot be insured; remove “insurance”.'});
-      }
-      // houses/apartments not tradable
-      if (/\b(trading|selling or trading)\b/i.test(firstSentence) && /\b(house|apartment|penthouse|mansion)\b/i.test(firstSentence)){
-        problems.push({type:'error', msg:'Houses and apartments are not tradable.'});
-      }
-    }
-
-    // License plate format
-    if (!validLicensePlate(formattedPreview)) {
+    if (!validLicensePlate(preview)){
       problems.push({type:'error', msg:'License plate must be 3–7 characters in length.'});
     }
 
-    // Beach market: generally no “Negotiable” needed; keep if price specified examples allow both, but we’ll remove redundant Negotiable-only lines when at Auto Fair or Beach Market templates
-    if (/at beach market/i.test(lc(formattedPreview)) && /Negotiable\.$/.test(lc(mline||''))){
-      mline = ''; // policy: Don’t need to mention negotiable.
+    // Category detection from final preview
+    const detected = detectCategory(preview);
+
+    // Auto: one vehicle per ad unless trading — we only allow one name field in the form, so we’re safe.
+
+    // Work tweaks: replace “level” with “years experience”
+    if (cat==='Work'){
+      subject = subject.replace(/\blevel\b/ig,'years experience');
     }
 
-    // Work: “level” → “years experience”
-    if (category==='Work'){
-      formattedPreview = formattedPreview.replace(/\blevel\b/ig,'years experience');
+    // Beach market negotiable line: if subject mentions “at the beach market shop №”, negotiable line can be omitted
+    if (/beach market shop №\d+/i.test(preview) && /Negotiable\.$/.test(mline)) {
+      mline = '';
     }
 
-    // 9) rebuild formatted after adjustments
-    formattedPreview = [firstSentence, mline].filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
-
-    // 10) Checks (caps, labels, №, punctuation)
-    renderChecks({formatted:formattedPreview, opener});
-
-    return {formatted:formattedPreview, category, problems};
+    const formatted = [subject, mline].filter(Boolean).join(' ').trim();
+    return {formatted, category: detected, problems};
   }
 
-  function renderChecks({formatted, opener}){
-    checks.innerHTML = '';
-    const add = (t, cls='')=>{
-      const span = document.createElement('span'); span.className='chip '+cls; span.textContent=t; checks.appendChild(span);
-    };
+  // Checks UI
+  function renderChecks({formatted, action}){
+    const wrap = els.checks; wrap.innerHTML='';
+    const add=(t,cls='')=>{ const s=document.createElement('span'); s.className='chip '+cls; s.textContent=t; wrap.appendChild(s); };
     /^[A-Z]/.test(formatted) ? add('Capitalization ✓','ok') : add('Capitalization ✕','bad');
-    if (opener==='Buying' && /Budget:/.test(formatted)) add('Buyer→Budget ✓','ok');
-    else if ((opener==='Selling'||opener==='Selling or trading') && /Price:/.test(formatted)) add('Seller→Price ✓','ok');
-    else if (opener==='Renting out' && /Rent:/.test(formatted)) add('Rent ✓','ok');
-    else if (/Trading/.test(opener) && !/Price:|Budget:/.test(formatted)) add('Trading money (optional) ✓','ok');
+    if (action==='Buying' && /Budget:/.test(formatted)) add('Buyer→Budget ✓','ok');
+    else if ((action==='Selling'||action==='Selling or trading') && /Price:/.test(formatted)) add('Seller→Price ✓','ok');
+    else if (action==='Renting out' && /Rent:/.test(formatted)) add('Rent ✓','ok');
+    else if (action==='Trading' && !/Price:|Budget:/.test(formatted)) add('Trading money (optional) ✓','ok');
     else add('Money label ✕','bad');
-
     /(?:house|apartment|penthouse|mansion) №\d+/i.test(formatted) ? add('№ format ✓','ok') : add('№ format —');
     /(\.|\d)$/.test(formatted.trim()) ? add('End punctuation ✓','ok') : add('End punctuation ✕','bad');
   }
 
-  // UI & list
+  // List & search
   const ADS = [];
-  function renderList(items, q=''){
+  function refreshList(q=''){
     const needle = lc(q.trim());
-    list.innerHTML = '';
-    items.filter(i => !needle || lc(i.text).includes(needle) || lc(i.category).includes(needle)).forEach(i=>{
+    els.list.innerHTML='';
+    ADS.filter(i => !needle || lc(i.text).includes(needle) || lc(i.category).includes(needle)).forEach(i=>{
       const div = document.createElement('div');
       div.className='ad';
       div.innerHTML = `
@@ -615,71 +541,82 @@
           <button class="btn ghost small" data-del="${i.id}">Delete</button>
         </div>
       `;
-      list.appendChild(div);
+      els.list.appendChild(div);
     });
-    list.querySelectorAll('button[data-copy]').forEach(b=>{
-      b.addEventListener('click', ()=>{
+    els.list.querySelectorAll('button[data-copy]').forEach(b=>{
+      b.addEventListener('click',()=>{
         const id = Number(b.getAttribute('data-copy'));
         const item = ADS.find(x=>x.id===id);
         navigator.clipboard.writeText(item.text);
         b.textContent='Copied ✓'; setTimeout(()=>b.textContent='Copy',900);
       });
     });
-    list.querySelectorAll('button[data-del]').forEach(b=>{
-      b.addEventListener('click', ()=>{
+    els.list.querySelectorAll('button[data-del]').forEach(b=>{
+      b.addEventListener('click',()=>{
         const id = Number(b.getAttribute('data-del'));
         const idx = ADS.findIndex(x=>x.id===id);
-        if (idx>=0){ ADS.splice(idx,1); renderList(ADS, search.value); }
+        if (idx>=0){ ADS.splice(idx,1); refreshList(els.search.value); }
       });
     });
   }
 
-  // Buttons
-  $('formatBtn').addEventListener('click', ()=>{
-    const {formatted, category, problems} = formatAd(raw.value);
-    out.textContent = formatted;
-    catChip.innerHTML = `<span class="chip">${category}</span>`;
-    renderProblems(problems);
+  // Events
+  els.categorySel.addEventListener('change', updateBlocks);
+  els.actionSel.addEventListener('change', updateMoneyLabel);
+  updateBlocks(); updateMoneyLabel();
+
+  els.genBtn.addEventListener('click', ()=>{
+    const res = buildAd();
+    els.out.textContent = res.formatted;
+    els.categoryChip.innerHTML = `<span class="chip">${res.category}</span>`;
+    renderProblems(res.problems);
+    renderChecks({formatted:res.formatted, action:els.actionSel.value});
   });
 
-  $('addBtn').addEventListener('click', ()=>{
-    const text = out.textContent.trim(); if (!text) return;
-    const category = detectCategory(text);
-    ADS.push({id:Date.now(), text, category});
-    renderList(ADS);
-    raw.value=''; out.textContent=''; catChip.innerHTML=`<span class="chip">—</span>`;
-    alerts.innerHTML = `<div class="success">Added to list.</div>`; setTimeout(()=>alerts.innerHTML='',1500);
+  els.addBtn.addEventListener('click', ()=>{
+    const text = els.out.textContent.trim(); if(!text) return;
+    ADS.push({id:Date.now(), text, category:detectCategory(text)});
+    refreshList();
+    els.alerts.innerHTML = `<div class="success">Added to list.</div>`; setTimeout(()=>els.alerts.innerHTML='',1200);
+    els.out.textContent='';
   });
 
-  $('clearBtn').addEventListener('click', ()=>{ raw.value=''; out.textContent=''; alerts.innerHTML=''; catChip.innerHTML=`<span class="chip">—</span>`; });
+  els.clearBtn.addEventListener('click', ()=>{
+    ['itemName','qty','money','reNum','reLoc','reWH','reOther'].forEach(id=> $(id).value='');
+    ['reGarden','reCustom','reIns','reHeli','autoVisual','autoLuminous','autoIns','autoTurbo','autoDrift'].forEach(id=> $(id).checked=false);
+    els.out.textContent=''; els.alerts.innerHTML='';
+  });
 
-  $('searchBtn').addEventListener('click', ()=> renderList(ADS, search.value));
-  search.addEventListener('keydown', e=>{ if(e.key==='Enter') $('searchBtn').click(); });
+  els.searchBtn.addEventListener('click', ()=> refreshList(els.search.value));
+  els.search.addEventListener('keydown', e=>{ if(e.key==='Enter') els.searchBtn.click(); });
 
-  $('exportBtn').addEventListener('click', ()=>{
+  els.exportBtn.addEventListener('click', ()=>{
     const blob = new Blob([JSON.stringify(ADS,null,2)], {type:'application/json'});
     const url = URL.createObjectURL(blob); const a=document.createElement('a');
     a.href=url; a.download='ads.json'; a.click(); URL.revokeObjectURL(url);
   });
 
-  $('copyBtn').addEventListener('click', ()=>{
-    const t = out.textContent.trim(); if(!t) return;
-    navigator.clipboard.writeText(t); $('copyBtn').textContent='Copied ✓'; setTimeout(()=>$('copyBtn').textContent='Copy output',900);
+  els.copyBtn.addEventListener('click', ()=>{
+    const t = els.out.textContent.trim(); if(!t) return;
+    navigator.clipboard.writeText(t); els.copyBtn.textContent='Copied ✓'; setTimeout(()=>els.copyBtn.textContent='Copy output',900);
   });
 
   function renderProblems(problems){
-    alerts.innerHTML='';
+    els.alerts.innerHTML='';
     problems.forEach(p=>{
       const div = document.createElement('div');
       div.className = p.type==='error' ? 'error' : 'warning';
+      div.style.cssText='border-left:4px solid '+(p.type==='error'?'var(--bad)':'var(--warn)')+'; padding:8px 10px; background:'+(p.type==='error'?'rgba(225,29,72,.12)':'rgba(217,119,6,.12)')+'; border-radius:10px; margin-top:8px';
       div.textContent = p.msg;
-      alerts.appendChild(div);
+      els.alerts.appendChild(div);
     });
   }
 
-  // Demo fill
-  raw.value = 'selling house no 85';
-  $('formatBtn').click(); // → Selling house №85. Price: Negotiable.
+  // Demo: quick example for your earlier test
+  els.categorySel.value='Real Estate'; updateBlocks();
+  els.actionSel.value='Selling'; updateMoneyLabel();
+  els.reType.value='house'; els.reNum.value='85'; els.itemName.value=''; els.money.value='Negotiable';
+  els.genBtn.click(); // => Selling house №85. Price: Negotiable.
 })();
 </script>
 </body>
