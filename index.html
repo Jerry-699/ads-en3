@@ -1,555 +1,1109 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Lifeinvader Ads — EN-03 (Auto-Detect + Manual Fix)</title>
-<style>
-  :root{
-    --bg:#0e1320; --card:#151b2d; --text:#e8eefc; --muted:#9fb0d3; --accent:#6aa0ff; --ok:#22c55e; --warn:#ffb020; --bad:#ef4444; --chip:#202945;
-    --shadow: 0 10px 30px rgba(10,14,25,.4);
-  }
-  html.light{
-    --bg:#f4f6fb; --card:#ffffff; --text:#0f172a; --muted:#64748b; --accent:#2563eb; --ok:#16a34a; --warn:#b7791f; --bad:#dc2626; --chip:#eef2ff;
-    --shadow: 0 10px 24px rgba(2,6,23,.08);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font:500 16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-  header{padding:28px 18px 8px;display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:0;background:linear-gradient(180deg,var(--bg) 80%,transparent);z-index:10}
-  .brand{font-weight:900;font-size:26px;letter-spacing:.3px}
-  .hint{color:var(--muted);font-size:13px}
-  .wrap{max-width:1100px;margin:0 auto;padding:16px}
-  .card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:16px 16px}
-  textarea,input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid transparent;background:var(--chip);color:var(--text);outline:none}
-  textarea{min-height:140px;resize:vertical}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-  .btn{all:unset;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
-  .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
-  .btn.warn{background:var(--warn);color:#111}
-  .btn.bad{background:var(--bad)}
-  .btn.ok{background:var(--ok)}
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{background:var(--chip);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px}
-  .out{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;padding:12px 14px;border-radius:10px;background:#0a0f1a22;border:1px dashed #7aa2ff55}
-  .toolbar{display:flex;gap:10px;flex-wrap:wrap}
-  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .badge{padding:3px 8px;border-radius:999px;font-size:12px;background:#1f2937;color:#cbd5e1}
-  .badge.ok{background:#052e1a;color:#a7f3d0}
-  .badge.warn{background:#3a2300;color:#fde68a}
-  .badge.bad{background:#3f0b0b;color:#fecaca}
-  .sectionTitle{font-weight:800;margin:8px 0 4px}
-  .muted{color:var(--muted)}
-  .toggle{display:inline-flex;gap:8px;align-items:center;cursor:pointer;user-select:none}
-  .switch{inline-size:46px;block-size:26px;background:#334155;border-radius:999px;position:relative}
-  .knob{position:absolute;inset:3px;inline-size:20px;block-size:20px;background:#fff;border-radius:50%;transition:transform .2s}
-  html.light .knob{transform:translateX(20px)}
-  .footer{opacity:.7;margin:30px 0 60px;text-align:center;font-size:13px}
-  @media (max-width:860px){
-    .row,.row3{grid-template-columns:1fr}
-  }
-</style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png" />
+    <link rel="icon" type="image/png" href="./assets/img/favicon.png" />
+
+    <title>Lifeinvaders Ad Template</title>
+
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css"
+        href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+
+    <!-- Nucleo Icons -->
+    <link href="./assets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="./assets/css/nucleo-svg.css" rel="stylesheet" />
+
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.min.css" />
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="style.css" />
+    <link id="pagestyle" href="./assets/css/material-kit.css?v=3.0.4" rel="stylesheet" />
 </head>
-<body>
-<header class="wrap">
-  <div>
-    <div class="brand">Lifeinvader Ads — EN-03</div>
-    <div class="hint">Policy-accurate ad builder with <b>Auto-Detect</b> raw-ad parser + Manual Fix & Learning.</div>
-  </div>
-  <label class="toggle">
-    <span class="hint">Day / Night</span>
-    <span class="switch"><span class="knob"></span></span>
-  </label>
-</header>
 
-<main class="wrap">
-  <!-- RAW AD -->
-  <section class="card" id="rawCard">
-    <div class="sectionTitle">⚡ Auto-Detect (Raw Ad) + Manual Fix</div>
-    <div class="hint" style="margin-bottom:8px">
-      Paste any raw text. The parser auto-detects <b>category</b>, <b>action</b>, and <b>money label</b>, fixes money formats (<i>20k → $20.000</i>, <i>1.5m → $1.5 Million</i>), maps <i>level 1–4</i> → <i>low/medium/high/max quality</i>,
-      applies Real Estate / Auto feature order, blocks blacklisted terms, and outputs a policy-perfect ad.
-    </div>
-    <textarea id="raw" placeholder="e.g., selling house no 85 garden 5 gs insurance • buyyingng a Ruby • Renting out house 1023 rent 100k / week • selling level 4 engine • price 20k …"></textarea>
-
-    <div class="toolbar" style="margin-top:10px">
-      <button class="btn" id="generateBtn">Generate</button>
-      <button class="btn ghost" id="clearBtn">Clear</button>
-      <span class="hint">k/m shorthands: <b>20k → $20.000</b>, <b>1.5k → $1.500</b>, <b>50m → $50 Million</b>.</span>
-    </div>
-
-    <!-- OUTPUT -->
-    <div style="margin-top:16px">
-      <div class="sectionTitle">Formatted Output</div>
-      <div class="row">
-        <input id="output" class="out" readonly placeholder="Your formatted ad will appear here…" />
-        <div class="toolbar" style="align-items:center">
-          <button class="btn ok" id="copyBtn">Copy</button>
-          <span id="detectChips" class="chips"></span>
+<body class="index-page bg-gray-200">
+    <!-- Navbar -->
+    <div class="container position-sticky z-index-sticky top-0">
+        <div class="row">
+            <div class="col-12"></div>
         </div>
-      </div>
     </div>
 
-    <!-- MANUAL FIX (AUTO-FILLED) -->
-    <div class="sectionTitle" style="margin-top:18px">Manual Fix (optional)</div>
-    <div class="row3">
-      <div>
-        <div class="muted">Opener</div>
-        <select id="mfOpener">
-          <option>Auto (detected)</option>
-          <option>Buying</option>
-          <option>Selling</option>
-          <option>Trading</option>
-          <option>Selling or trading</option>
-          <option>Renting out</option>
-          <option>Renting</option>
-          <option>Looking for</option>
-        </select>
-      </div>
-      <div>
-        <div class="muted">Subject (edit main sentence)</div>
-        <input id="mfSubject" placeholder='e.g., house №85 with a garden, 5 g.s. and insurance' />
-      </div>
-      <div>
-        <div class="muted">Amount</div>
-        <input id="mfAmount" placeholder='e.g., 20k, 1.7k each, 5m, Negotiable' />
-      </div>
+    <header class="header-2">
+        <div class="page-header min-vh-25 relative" style="background-image: url('./assets/img/bg2.jpg')">
+            <span class="mask bg-gradient-primary opacity-4"></span>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-7 text-center mx-auto">
+                        <h1 class="text-white pt-3 mt-n5">Lifeinvader Ads</h1>
+                        <p class="lead text-white mt-3"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="card card-body blur shadow-blur mx-3 mx-md-4 mt-n6">
+        <section class="pt-3 pb-4" id="count-stats">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-10 mx-auto py-3">
+                        <div class="nav-wrapper position-relative end-0">
+                            <div class="row">
+                                <div class="col-10 p-0">
+                                    <ul class="nav nav-pills nav-fill p-1" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab"
+                                                href="#real-estate" role="tab" aria-controls="real-estate"
+                                                aria-selected="true">
+                                                <span class="material-icons align-middle mb-1">
+                                                    location_city
+                                                </span>
+                                                Real Estate
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="#auto"
+                                                role="tab" aria-controls="auto" aria-selected="false">
+                                                <span class="material-icons align-middle mb-1">
+                                                    directions_car
+                                                </span>
+                                                Auto
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="#other"
+                                                role="tab" aria-controls="other" aria-selected="false">
+                                                <span class="material-icons align-middle mb-1">
+                                                    all_inclusive
+                                                </span>
+                                                Other
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="#Business"
+                                                role="tab" aria-controls="Business" aria-selected="false">
+                                                <span class="material-icons align-middle mb-1">
+                                                    all_inclusive
+                                                </span>
+                                                BigBusiness
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="#dating"
+                                                role="tab" aria-controls="dating" aria-selected="false">
+                                                <span class="material-icons align-middle mb-1">
+                                                    favorite
+                                                </span>
+                                                Dating
+                                            </a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="#work"
+                                                role="tab" aria-controls="work" aria-selected="false">
+                                                <span class="material-icons align-middle mb-1">
+                                                    engineering
+                                                </span>
+                                                Work
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-2 ps-3 pe-0">
+                                    <button class="btn bg-gradient-primary mb-5 mb-sm-0 w-100"
+                                        onclick="clearForm('realEstateForm', realEstateTemplate)">
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 p-0">
+                                    <div class="tab-content pt-3" id="pills-tabContent">
+                                        <div class="tab-pane fade active show" id="real-estate" role="tabpanel"
+                                            aria-labelledby="real-estate-tab" tabindex="0">
+                                            <form id="realEstateForm" action="#">
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                        <h6>Purpose</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="rePurpose" id="rePurpose1" value="Selling" checked
+                                                                onchange="getValue('rePurpose1', 'reValue')" />
+                                                            <label class="custom-control-label"
+                                                                for="rePurpose1">Selling</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="rePurpose" id="rePurpose2" value="Buying"
+                                                                onchange="getValue('rePurpose2', 'reValue')" />
+                                                            <label class="custom-control-label"
+                                                                for="rePurpose2">Buying</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <h6>Type</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio" name="reType"
+                                                                id="reType1" value="house" checked />
+                                                            <label class="custom-control-label"
+                                                                for="reType1">house</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio" name="reType"
+                                                                id="reType2" value="apartment" />
+                                                            <label class="custom-control-label"
+                                                                for="reType2">apartment</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio" name="reType"
+                                                                id="reType3" value="mansion" />
+                                                            <label class="custom-control-label"
+                                                                for="reType3">mansion</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio" name="reType"
+                                                                id="reType4" value="Casino penthouse" />
+                                                            <label class="custom-control-label"
+                                                                for="reType4">penthouse</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <h6>Number</h6>
+                                                        <div class="input-group input-group-outline">
+                                                            <label class="form-label">Number</label>
+                                                            <input type="number" name="reNumber" id="reNumber" value=""
+                                                                class="form-control" />
+                                                            <button class="btn bg-gradient-primary mb-5 mb-sm-0"
+                                                                onclick="clearFields('reNumber', realEstateTemplate)">
+                                                                Clear
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-1"></div>
+                                                    <div class="col">
+                                                        <h6 id="reValue">Price:</h6>
+                                                        <div class="input-group input-group-outline">
+                                                            <label class="form-label"></label>
+                                                            <input type="number" name="rePrice" id="rePrice"
+                                                                class="form-control" value="" />
+                                                            <button class="btn bg-gradient-primary mb-5 mb-sm-0"
+                                                                onclick="clearFields('rePrice', realEstateTemplate)">
+                                                                Clear
+                                                            </button>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value=" Million." id="reValueM" name="reValueM" />
+                                                            <label class="custom-control-label"
+                                                                for="reValueM">Million.</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox" value=".000"
+                                                                id="reValueK" name="reValueK" />
+                                                            <label class="custom-control-label"
+                                                                for="reValueK">Thousnad</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-5">
+                                                    <div class="col">
+                                                        <h6>Garden</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="a garden" id="reGarden" name="reGarden" />
+                                                            <label class="custom-control-label"
+                                                                for="reGarden">garden</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <h6>Garage spaces</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox" value=""
+                                                                id="reGarageSpaces"
+                                                                onchange="activateRadioOptions('reGarageSpaces', 'garage-space')" />
+                                                            <label class="custom-control-label"
+                                                                for="reGarageSpaces">Garage spaces</label>
+                                                        </div>
+                                                        <div class="garage-space">
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="garageSpace" id="gs1" value="2 g.s."
+                                                                    disabled />
+                                                                <label class="custom-control-label" for="gs1">2
+                                                                    g.s.</label>
+                                                            </div>
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="garageSpace" id="gs2" value="5 g.s."
+                                                                    disabled />
+                                                                <label class="custom-control-label" for="gs2">5
+                                                                    g.s.</label>
+                                                            </div>
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="garageSpace" id="gs3" value="9 g.s."
+                                                                    disabled />
+                                                                <label class="custom-control-label" for="gs3">9
+                                                                    g.s.</label>
+                                                            </div>
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="garageSpace" id="gs4" value="25 g.s."
+                                                                    disabled />
+                                                                <label class="custom-control-label" for="gs4">25
+                                                                    g.s.</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <h6>Warehouses</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox" value=""
+                                                                id="reWarehouses"
+                                                                onchange="activateRadioOptions('reWarehouses', 'warehouses')" />
+                                                            <label class="custom-control-label"
+                                                                for="reWarehouses">Warehouses</label>
+                                                        </div>
+                                                        <div class="warehouses">
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="warehouse" id="wh1" value="3 w.h." disabled />
+                                                                <label class="custom-control-label" for="wh1">3
+                                                                    w.h.</label>
+                                                            </div>
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="warehouse" id="wh2" value="4 w.h." disabled />
+                                                                <label class="custom-control-label" for="wh2">4
+                                                                    w.h.</label>
+                                                            </div>
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="warehouse" id="wh3" value="5 w.h." disabled />
+                                                                <label class="custom-control-label" for="wh3">5
+                                                                    w.h.</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <h6>Custom Interior</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="custom interior" id="reCustomInterior"
+                                                                name="reCustomInterior" />
+                                                            <label class="custom-control-label"
+                                                                for="reCustomInterior">custom interior</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <h6>Insurance</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="insurance" id="reInsurance" name="reInsurance" />
+                                                            <label class="custom-control-label"
+                                                                for="reInsurance">insurance</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <h6>Other</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="helipad" id="reHelipad" name="reHelipad" />
+                                                            <label class="custom-control-label"
+                                                                for="reHelipad">helipad</label>
+                                                        </div>
+
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="swimming pool" id="reSwimmingPool"
+                                                                name="reSwimmingPool" />
+                                                            <label class="custom-control-label"
+                                                                for="reSwimmingPool">swimming pool</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="tennis court" id="reTennisCourt"
+                                                                name="reTennisCourt" />
+                                                            <label class="custom-control-label"
+                                                                for="reTennisCourt">tennis court</label>
+                                                        </div>
+
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="long driveway" id="reDriveway" name="reDriveway" />
+                                                            <label class="custom-control-label"
+                                                                for="reDriveway">driveway</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="spacious backyard" id="reBackyard" name="reBackyard" />
+                                                            <label class="custom-control-label"
+                                                                for="reBackyard">backyard</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <h6>View</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox" value=""
+                                                                id="reView"
+                                                                onchange="activateRadioOptions('reView', 'view')" />
+                                                            <label class="custom-control-label"
+                                                                for="reView">View</label>
+                                                        </div>
+                                                        <div class="view">
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="reView" id="view1" value="nice" disabled />
+                                                                <label class="custom-control-label"
+                                                                    for="view1">nice</label>
+                                                            </div>
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="reView" id="view2" value="beautiful"
+                                                                    disabled />
+                                                                <label class="custom-control-label"
+                                                                    for="view2">beautiful</label>
+                                                            </div>
+                                                            <div class="form-check ps-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="reView" id="view3" value="great" disabled />
+                                                                <label class="custom-control-label"
+                                                                    for="view3">great</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-5">
+                                                    <div class="col-2 mb-2">
+                                                        <div class="form-check ps-0">
+                                                            <label class="custom-control-label" for="reLocation">
+                                                                Location&nbsp;
+                                                            </label>
+                                                            <input class="form-check-input" type="checkbox" value=""
+                                                                id="reLocation"
+                                                                onchange="activateRadioOptions('reLocation', 'location')" />
+                                                        </div>
+                                                    </div>
+                                                    <div id="reLocation_1" class="col location d-flex">
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="beforeLocation" id="beforeLocation1" value="in"
+                                                                disabled />
+                                                            <label class="custom-control-label"
+                                                                for="beforeLocation1">in</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="beforeLocation" id="beforeLocation2" value="near"
+                                                                disabled />
+                                                            <label class="custom-control-label"
+                                                                for="beforeLocation2">near</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row location">
+                                                    <div id="reLocation_2" class="col"></div>
+                                                    <div id="reLocation_3" class="col"></div>
+                                                    <div id="reLocation_4" class="col"></div>
+                                                    <div id="reLocation_5" class="col"></div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="auto" role="tabpanel" aria-labelledby="auto-tab"
+                                            tabindex="0">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <h6>Purpose</h6>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="radio" name="autoPurpose"
+                                                            id="autoPurpose1" value="Selling" checked
+                                                            onchange="getValue('autoPurpose1', 'autoValue')" />
+                                                        <label class="custom-control-label"
+                                                            for="autoPurpose1">Selling</label>
+                                                    </div>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="radio" name="autoPurpose"
+                                                            id="autoPurpose2" value="Buying"
+                                                            onchange="getValue('autoPurpose2', 'autoValue')" />
+                                                        <label class="custom-control-label"
+                                                            for="autoPurpose2">Buying</label>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-5">
+                                                    <h6>Name:</h6>
+                                                    <div class="input-group input-group-outline .autocomplete">
+
+                                                        <input id="autoName" name="autoName" type="search"
+                                                            spellcheck="false" autocorrect="off" autocomplete="off"
+                                                            autocapitalize="off" class="form-control" value=""
+                                                            style="padding: 0 2rem 0 3.2rem !important" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <h6 id="autoValue">Price:</h6>
+                                                    <div class="input-group input-group-outline">
+                                                        <label class="form-label"></label>
+                                                        <input type="number" name="autoPrice" id="autoPrice"
+                                                            class="form-control" value="" />
+                                                        <button class="btn bg-gradient-primary mb-5 mb-sm-0"
+                                                            onclick="clearFields('autoPrice', autoTemplate)">
+                                                            Clear
+                                                        </button>
+                                                    </div>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            value=" Million." id="autoPriceM" name="autoPriceM" />
+                                                        <label class="custom-control-label"
+                                                            for="autoPriceM">Million.</label>
+                                                    </div>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox" value=".000"
+                                                            id="autoPriceK" name="autoPriceK" />
+                                                        <label class="custom-control-label" for="autoPriceK">Thousnad</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-5">
+                                                <div class="col">
+                                                    <h6>Configuration</h6>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox" value=""
+                                                            id="autoConfig"
+                                                            onchange="activateRadioOptions('autoConfig', 'auto-config')" />
+                                                        <label class="custom-control-label"
+                                                            for="autoConfig">configuration</label>
+                                                    </div>
+                                                    <div class="auto-config">
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="autoConfig" id="config1"
+                                                                value="full configuration" disabled />
+                                                            <label class="custom-control-label"
+                                                                for="config1">Full</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="autoConfig" id="config2"
+                                                                value="partial configuration" disabled />
+                                                            <label class="custom-control-label"
+                                                                for="config2">Partial</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <h6>Visual Upgrades</h6>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            value="visual upgrades" id="autoVisuals"
+                                                            name="autoVisuals" />
+                                                        <label class="custom-control-label" for="autoVisuals">visual
+                                                            upgrades</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <h6>Luminous Wheels</h6>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            value="luminous wheels" id="autoLumiWheels"
+                                                            name="autoLumiWheels" />
+                                                        <label class="custom-control-label"
+                                                            for="autoLumiWheels">luminous wheels</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <h6>Insurance</h6>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            value="insurance" id="autoInsurance" name="autoInsurance" />
+                                                        <label class="custom-control-label"
+                                                            for="autoInsurance">insurance</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <h6>Turbo Kit</h6>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            value="turbo kit" id="autoTurboKit" name="autoTurboKit" />
+                                                        <label class="custom-control-label" for="autoTurboKit">turbo
+                                                            kit</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <h6>Drift Kit</h6>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            value="drift kit" id="autoDriftKit" name="autoDriftKit" />
+                                                        <label class="custom-control-label" for="autoDriftKit">drift
+                                                            kit</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="other" role="tabpanel"
+                                            aria-labelledby="other-tab" tabindex="0">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <h6>Purpose</h6>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="radio" name="otherPurpose"
+                                                            id="otherPurpose1" value="Selling" checked
+                                                            onchange="getValue('otherPurpose1', 'otherValue')" />
+                                                        <label class="custom-control-label"
+                                                            for="otherPurpose1">Selling</label>
+                                                    </div>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="radio" name="otherPurpose"
+                                                            id="otherPurpose2" value="Buying"
+                                                            onchange="getValue('otherPurpose2', 'otherValue')" />
+                                                        <label class="custom-control-label"
+                                                            for="otherPurpose2">Buying</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-5">
+                                                    <h6>Item(s) (Max 3)</h6>
+                                                    <input id="otherItem1" name="otherItem1" type="text"
+                                                        class="form-control" placeholder="First item..." required />
+                                                    <input id="otherItem2" name="otherItem2" type="text"
+                                                        class="form-control mt-2"
+                                                        placeholder="Second item (optional)..." />
+                                                    <input id="otherItem3" name="otherItem3" type="text"
+                                                        class="form-control mt-2"
+                                                        placeholder="Third item (optional)..." />
+                                                </div>
+
+                                                <div class="col-4">
+                                                    <h6 id="otherValue">Price:</h6>
+                                                    <div class="input-group input-group-outline">
+                                                        <input type="number" name="otherPrice" id="otherPrice"
+                                                            class="form-control" placeholder="Enter Price" />
+                                                        <button class="btn bg-gradient-primary"
+                                                            onclick="clearFields('otherPrice', otherTemplate)">Clear</button>
+                                                    </div>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            value=" Million." id="otherPriceM" name="otherPriceM" />
+                                                        <label class="custom-control-label"
+                                                            for="otherPriceM">Million.</label>
+                                                    </div>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox" value=".000"
+                                                            id="otherPriceK" name="otherPriceK" />
+                                                        <label class="custom-control-label" for="otherPriceK">Thousnad</label>
+                                                    </div>
+                                                    <div class="form-check ps-0">
+                                                        <input class="form-check-input" type="checkbox" value=" each"
+                                                            id="otherPriceE" name="otherPriceE" />
+                                                        <label class="custom-control-label"
+                                                            for="otherPriceE">Each.</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-4">
+                                                <div class="col-12">
+                                                    <h6>Event & Services</h6>
+                                                    <select id="otherServices" class="form-control">
+                                                        <option value="">Select Service/Event</option>
+                                                        <option value="Looking for a party.">Party</option>
+                                                        <option value="Car meet at ">Car meet</option>
+                                                        <option value="Party at the beach.">Beach Party</option>
+                                                        <option value="Party at Tequi-la-la Bar.">Tequi-la-la Bar Party</option>
+                                                        <option value="Party at Cayo Perico.">Cayo Perico Party</option>
+                                                        <option value="Party at house №">House Party</option>
+                                                        <option value="Pool party at house №0">House Pool Party</option>
+                                                        <option value="Party at the yacht.">Yacht Party</option>
+                                                        <option value="Party at Bahama Mamas Bar.">Bahama Mamas Bar Party</option>
+                                                        <option value="Looking for an alliance.">Alliance.</option>
+                                                        <option value="Looking for a lawyer.">Lawyer</option>
+                                                        <option value="Looking for a personal driver.">Personal Driver</option>
+                                                        <option value="Looking for a professional dancer.">Professional Dancer</option>
+                                                        <option value="Looking for a professional singer.">Professional Singer</option>
+                                                        <option value="Looking for a DJ.">DJ</option>
+                                                        <option value="wedding at a ">Wedding at a location</option>
+                                                        <option value="Wedding at Church.">Wedding</option>
+                                                        <option value="Wedding at Church for John Smith and Susan Jones at 18:00.">Wedding Location & Time</option>                                                    
+                                                        <option value="Looking to play poker.">Play Poker</option>
+                                                        <option value="Looking to play dice. Bet: $0">Dice Bet</option>
+                                                        <option value="Looking to play dice">Looking to play dice</option>
+                                                        <option value="Selling various items at the beach market shop №0.">Various items at the beach market shop</option>
+                                                        <option value="Selling various items for good prices at the beach market shop №0.">Various items for good prices at the beach market shop</option>
+                                                        <option value="Looking for a 24/7 Store owner.">24/7 Store owner</option>
+                                                        <option value="Looking for a Clothing Shop owner.">Clothing Shop owner</option>
+                                                        <option value="Looking for an Ammunition Store owner.">Ammunition Store owner</option>
+                                                        <option value="Looking for a Gas Station owner.">Gas Station owner</option>
+                                                        <option value="Looking for a Car sharing owner.">Car sharing owner</option>
+                                                        <option value="Looking for a Juice Shop owner.">Juice Shop owner</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Location Selection (Initially Hidden) -->
+                                            <div class="row mt-3" id="locationSection" style="display: none;">
+                                                <div class="col">
+                                                    <h6>Select Location</h6>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio"
+                                                            name="eventLocation" id="location1" value="Downtown">
+                                                        <label class="form-check-label" for="location1">Downtown</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio"
+                                                            name="eventLocation" id="location2" value="Vinewood">
+                                                        <label class="form-check-label" for="location2">Vinewood</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio"
+                                                            name="eventLocation" id="location3" value="Beachside">
+                                                        <label class="form-check-label"
+                                                            for="location3">Beachside</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-4">
+                                                <div class="col-12">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="Business" role="tabpanel"
+                                            aria-labelledby="Business-tab" tabindex="0">
+                                            <form id="BusinessForm" action="#">
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                        <h6>Purpose</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="buPurpose" id="buPurpose1" value="Selling" checked
+                                                                onchange="getValue('buPurpose1', 'buValue')" />
+                                                            <label class="custom-control-label"
+                                                                for="buPurpose1">Selling</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="buPurpose" id="buPurpose2" value="Buying"
+                                                                onchange="getValue('buPurpose2', 'buValue')" />
+                                                            <label class="custom-control-label"
+                                                                for="buPurpose2">Buying</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <h6>Type</h6>
+
+
+                                                        <div class="input-group input-group-outline">
+                                                            <select name="Businessname" id="Businessname"
+                                                                class="form-control">
+                                                                <option value="">Select a Business Type</option>
+                                                            </select>
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <div class="col">
+                                                        <h6>Number</h6>
+                                                        <div class="input-group input-group-outline">
+                                                            <label class="form-label">Number</label>
+                                                            <input type="number" name="buNumber" id="buNumber" value=""
+                                                                class="form-control" />
+                                                            <button class="btn bg-gradient-primary mb-5 mb-sm-0"
+                                                                onclick="clearFields('buNumber', realEstateTemplate)">
+                                                                Clear
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-1"></div>
+                                                    <div class="col">
+                                                        <h6 id="buValue">Price:</h6>
+                                                        <div class="input-group input-group-outline">
+                                                            <label class="form-label"></label>
+                                                            <input type="number" name="buPrice" id="buPrice"
+                                                                class="form-control" value="" />
+                                                            <button class="btn bg-gradient-primary mb-5 mb-sm-0"
+                                                                onclick="clearFields('buPrice', realEstateTemplate)">
+                                                                Clear
+                                                            </button>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value=" Million." id="buValueM" name="buValueM" />
+                                                            <label class="custom-control-label"
+                                                                for="buValueM">Million.</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="checkbox" value=".000"
+                                                                id="buValueK" name="buValueK" />
+                                                            <label class="custom-control-label"
+                                                                for="buValueK">Thousnad</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mt-5">
+                                                    <div class="col-2 mb-2">
+                                                        <div class="form-check ps-0">
+                                                            <label class="custom-control-label" for="buLocation">
+                                                                Location&nbsp;
+                                                            </label>
+                                                            <input class="form-check-input" type="checkbox" value=""
+                                                                id="buLocation"
+                                                                onchange="activateRadioOptions('buLocation', 'location')" />
+                                                        </div>
+                                                    </div>
+                                                    <div id="buLocation_1" class="col location d-flex">
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="beforeLocation" id="beforeLocation1" value="in"
+                                                                disabled />
+                                                            <label class="custom-control-label"
+                                                                for="beforeLocation1">in</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="beforeLocation" id="beforeLocation2" value="near"
+                                                                disabled />
+                                                            <label class="custom-control-label"
+                                                                for="beforeLocation2">near</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row location">
+                                                    <div id="buLocation_2" class="col"></div>
+                                                    <div id="buLocation_3" class="col"></div>
+                                                    <div id="buLocation_4" class="col"></div>
+                                                    <div id="buLocation_5" class="col"></div>
+                                                </div>
+                                            </form>
+
+
+
+
+                                        </div>
+                                        <div class="tab-pane fade" id="dating" role="tabpanel"
+                                            aria-labelledby="dating-tab" tabindex="0">
+                                            <form id="datingForm" action="#">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <h6>Purpose</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="datingPurpose" id="datingPurpose1"
+                                                                value="Looking for" checked />
+                                                            <label class="custom-control-label"
+                                                                for="datingPurpose1">Looking for</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <h6>Name:</h6>
+                                                        <div class="input-group input-group-outline">
+                                                            <input id="datingName" name="datingName" type="text"
+                                                                spellcheck="false" autocorrect="off" autocomplete="off"
+                                                                autocapitalize="off" class="form-control"
+                                                                placeholder="First and Last Name" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col">
+                                                        <h6>Category</h6>
+                                                        <select id="datingCategory" class="form-control">
+                                                            <option value="family">Looking for a family.</option>
+                                                            <option value="family_members">Looking for family members.
+                                                            </option>                                                            
+                                                            <option value="date">Looking for a date.</option>
+                                                            <option value="wife">Looking for a wife.</option>
+                                                            <option value="husband">Looking for a husband.</option>
+                                                            <option value="valentine">Looking for a valentine.</option>
+                                                            <option value="friend">Looking for a friend.</option>
+                                                            <option value="friends">Looking for friends.</option>
+                                                            <option value="boyfriend">Looking for a boyfriend.</option>
+                                                            <option value="boyfriends">Looking for boyfriends.</option>
+                                                            <option value="girlfriend">Looking for a girlfriend.</option>
+                                                            <option value="girlfriends">Looking for girlfriends.</option>
+                                                            <option value="poker">Looking for Casino poker players.
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col">
+                                                        <button type="button" class="btn bg-gradient-primary w-100"
+                                                            onclick="validateDatingAd()">Submit Ad</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col">
+                                                        <textarea id="datingOutput" class="form-control" rows="3"
+                                                            readonly
+                                                            placeholder="Generated Ad will appear here..."></textarea>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="work" role="tabpanel" aria-labelledby="work-tab"
+                                            tabindex="0">
+                                            <form id="workForm" action="#">
+                                                <div class="row">
+                                                    <div class="col-3">
+                                                        <h6>Job Type</h6>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio" name="workType"
+                                                                id="workType1" value="Hiring" checked />
+                                                            <label class="custom-control-label"
+                                                                for="workType1">Hiring</label>
+                                                        </div>
+                                                        <div class="form-check ps-0">
+                                                            <input class="form-check-input" type="radio" name="workType"
+                                                                id="workType2" value="Looking for Work" />
+                                                            <label class="custom-control-label" for="workType2">Looking
+                                                                for Work</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-5">
+                                                        <h6>Job Role:</h6>
+                                                        <select id="workRole" name="workRole" class="form-control">
+                                                            <option value="">Select Role</option>
+                                                            <option value="locksmith">Locksmith (Lumberjack)</option>
+                                                            <option value="electrician">Electrician</option>
+                                                            <option value="gardener">Gardener (Farmer)</option>
+                                                            <option value="surveyor">Surveyor (Oilman)</option>
+                                                            <option value="driver">Driver</option>
+                                                            <option value="a trucker">Trucker</option>
+                                                            <option value="Lawyer">Lawyer</option>
+                                                            <option value="DJ">DJ</option>
+                                                            <option value="photographer">Photographer</option>
+                                                            <option value="bodyguard">Bodyguard</option>
+                                                            <option value="dancer">Dancer</option>
+                                                            <option value="professional dancers">Professional Dancers</option>
+                                                            <option value="personal driver">Personal Driver</option>
+                                                            <option value="an assistant">Assistant</option>
+                                                            <option value="singer">Professional Singer</option>
+                                                            <option value="workers for solar panel plantations">Solar Panel Plantations</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-4">
+                                                        <h6>Salary:</h6>
+                                                        <input type="number" id="workSalary" name="workSalary"
+                                                            class="form-control"
+                                                            placeholder="Enter Amount (if applicable)" />
+                                                        <div class="form-check ps-0 mt-2">
+                                                            <input class="form-check-input" type="checkbox" id="salaryM"
+                                                                name="salaryM" value=" Million."
+                                                                onclick="toggleSalaryCheckbox('salaryM', 'salaryK')" />
+                                                            <label class="custom-control-label"
+                                                                for="salaryM">Million</label>
+                                                        </div>
+                                                        <div class="form-check ps-0 mt-2">
+                                                            <input class="form-check-input" type="checkbox" id="salaryK"
+                                                                name="salaryK" value=".000"
+                                                                onclick="toggleSalaryCheckbox('salaryK', 'salaryM')" />
+                                                            <label class="custom-control-label" for="salaryK">Thousnad</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mt-3">
+                                                    <div class="col">
+                                                        <h6>Construction Site (if applicable):</h6>
+                                                        <select id="constructionSite" name="constructionSite"
+                                                            class="form-control">
+                                                            <option value="">Not Applicable</option>
+                                                            <option value="Construction site №1, Vespucci Boulevard">
+                                                                Construction site №1, Vespucci Boulevard</option>
+                                                            <option value="Construction site №2, Calais Avenue">
+                                                                Construction site №2, Calais Avenue</option>
+                                                            <option value="Construction site №3, Pillbox Hill">
+                                                                Construction site №3, Pillbox Hill</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </form>
+
+
+                                        </div>
+
+
+
+                                        <!-- <div class="row">
+                          <div class="col-md-4 position-relative">
+                            <div class="p-3 text-center">
+                              <h1 class="text-gradient text-primary">
+                                <span id="state1" countTo="70">0</span>+
+                              </h1>
+                              <h5 class="mt-3">Coded Elements</h5>
+                              <p class="text-sm font-weight-normal">
+                                From buttons, to inputs, navbars, alerts or cards, you are
+                                covered
+                              </p>
+                            </div>
+                            <hr class="vertical dark" />
+                          </div>
+                          <div class="col-md-4 position-relative">
+                            <div class="p-3 text-center">
+                              <h1 class="text-gradient text-primary">
+                                <span id="state2" countTo="15">0</span>+
+                              </h1>
+                              <h5 class="mt-3">Design Blocks</h5>
+                              <p class="text-sm font-weight-normal">
+                                Mix the sections, change the colors and unleash your
+                                creativity
+                              </p>
+                            </div>
+                            <hr class="vertical dark" />
+                          </div>
+                          <div class="col-md-4">
+                            <div class="p-3 text-center">
+                              <h1
+                                class="text-gradient text-primary"
+                                id="state3"
+                                countTo="4"
+                              >
+                                0
+                              </h1>
+                              <h5 class="mt-3">Pages</h5>
+                              <p class="text-sm font-weight-normal">
+                                Save 3-4 weeks of work when you use our pre-made pages for
+                                your website
+                              </p>
+                            </div>
+                          </div>
+                        </div> -->
+                                    </div>
+                                </div>
+                                <div class="row mt-5">
+                                    <div class="col">
+                                        <form action="#" id="finalOutputForm">
+                                            <div class="input-group input-group-outline my-3">
+                                                <!-- <label class="form-label"></label> -->
+                                                <input type="text" id="finalOutput" class="form-control" />
+                                                <!-- The button used to copy the text -->
+                                                <button class="btn bg-gradient-primary mb-5 mb-sm-0"
+                                                    onclick="copyText()">
+                                                    Copy text
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+        </section>
     </div>
-    <div class="row3" style="margin-top:10px">
-      <div>
-        <div class="muted">Money label</div>
-        <select id="mfLabel">
-          <option>Auto (detected)</option>
-          <option>Price:</option>
-          <option>Budget:</option>
-          <option>Rent:</option>
-        </select>
-      </div>
-      <div>
-        <div class="muted">Detected category (read-only)</div>
-        <input id="mfCat" readonly placeholder="Auto / Real Estate / Business / Dating / Work / Other" />
-      </div>
-      <div style="display:flex;gap:10px;align-items:end">
-        <button class="btn" id="applyBtn">Apply</button>
-        <button class="btn ok" id="applySaveBtn">Apply & Save</button>
-      </div>
-    </div>
 
-    <!-- LEARNING -->
-    <div class="card" style="margin-top:14px;background:transparent;border:1px dashed #6aa0ff55">
-      <div class="row">
-        <div class="muted">Learning rules</div>
-        <label class="toggle" style="justify-self:end">
-          <span class="hint">Auto-apply rules</span>
-          <span class="switch"><span class="knob"></span></span>
-          <input id="autoApply" type="checkbox" hidden>
-        </label>
-      </div>
-      <div id="ruleInfo" class="hint">No rules saved yet.</div>
-    </div>
-  </section>
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="text-center">
+                        <p class="text-dark my-4 text-sm font-weight-normal">
+                            All rights reserved. Copyright ©
+                            <script>
+                                document.write(new Date().getFullYear());
+                            </script>
+                            Created By
+                            <a href="//144.24.100.43/lp" target="_blank">MAX</a> with
+                            <span class="material-icons text-primary align-middle mb-1">favorite</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-  <p class="footer">Built for EN-03 policy accuracy — opener words; Price/Budget/Rent; dot-thousands; № for numbers; Real Estate feature order; vehicles quoted with upgrade order (configuration → visual upgrades → luminous wheels → insurance → turbo kit → drift kit); blacklist; level→quality mapping.</p>
-</main>
+    <!--   Core JS Files   -->
+    <script src="./assets/js/core/popper.min.js" type="text/javascript"></script>
+    <!-- <script
+      src="./assets/js/core/bootstrap.min.js"
+      type="text/javascript"
+    ></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script src="./assets/js/plugins/perfect-scrollbar.min.js"></script>
 
-<script>
-/* --------------------------- Helpers & Data --------------------------- */
-const el = id => document.getElementById(id);
-const $ = {
-  raw: el('raw'), out: el('output'), chips: el('detectChips'),
-  gen: el('generateBtn'), clear: el('clearBtn'), copy: el('copyBtn'),
-  mfOpen: el('mfOpener'), mfSub: el('mfSubject'), mfAmt: el('mfAmount'),
-  mfLabel: el('mfLabel'), mfCat: el('mfCat'),
-  apply: el('applyBtn'), applySave: el('applySaveBtn'),
-  autoApply: el('autoApply'), ruleInfo: el('ruleInfo')
-};
+    <!--  Plugin for TypedJS, full documentation here: https://github.com/inorganik/CountUp.js -->
+    <script src="./assets/js/plugins/countup.min.js"></script>
 
-const ACTION_WORDS = [
-  'selling or trading','selling or trade','sell or trade',
-  'trading','trade',
-  'renting out','renting','rent out',
-  'buying','looking to buy','looking to purchase','want to buy','wtb',
-  'selling','for sale','wts'
-];
+    <script src="./assets/js/plugins/choices.min.js"></script>
 
-const MONEY_LABEL = { Selling:'Price:', Buying:'Budget:', Trading:'Price:', 'Selling or trading':'Price:', 'Renting out':'Rent:', Renting:'Budget:', 'Looking for':'Budget:' };
+    <script src="./assets/js/plugins/prism.min.js"></script>
+    <script src="./assets/js/plugins/highlight.min.js"></script>
 
-const OFFICIAL_PLACES = [
-  'Vinewood Hills','Rockford Hills','Richman','Sandy Shores','Paleto Bay','Postal','Hospital','Capitol','Fire Station','Auto Fair',
-  'Bahama Mamas Bar','Tequi-la-la Bar','FIB','Hotel Spa Bar','Pacific Bluffs Country Club','Diamond Resort Bar',
-  'Vanilla Unicorn Bar','Church','Stock Exchange','Stadium','Chumash','Lifeinvader','Del Perro Pier','Del Perro Beach',
-  'Cayo Perico Island','Hotel','Raton Canyon','School','SAHP'
-];
+    <!--  Plugin for Parallax, full documentation here: https://github.com/dixonandmoe/rellax -->
+    <script src="./assets/js/plugins/rellax.min.js"></script>
+    <!--  Plugin for TiltJS, full documentation here: https://gijsroge.github.io/tilt.js/ -->
+    <script src="./assets/js/plugins/tilt.min.js"></script>
+    <!--  Plugin for Selectpicker - ChoicesJS, full documentation here: https://github.com/jshjohnson/Choices -->
+    <script src="./assets/js/plugins/choices.min.js"></script>
 
-const BUSINESS_LIST = [
-  'Ammunition Store','Bar','Car wash','Chip tuning','Clothing shop','Cowshed','Electric station','Farm','Flower shop','Freight train',
-  'Gas station','Grand Elite','Hair salon','Jewelry store','Oil Well','Parking','Pet Shop','Plantation','Car sharing','State object',
-  'Service station','24/7 Store','Tattoo studio','Taxi company','ATM business','Juice shop','Burger shop','Warehouse','Fight club'
-];
+    <!--  Plugin for Parallax, full documentation here: https://github.com/wagerfield/parallax  -->
+    <script src="./assets/js/plugins/parallax.min.js"></script>
 
-const BLACKLIST = [
- 'firearm','gun','pistol','rifle','ammunition','bulletproof','armor plate','weed','cannabis','drug','cocaine',
- 'ems surgical mask','medical mask','covid mask','balaclava','scanner','radar','rope','head bag','usb with virus',
- 'lock pick','crowbar','troll','animal skin','satellite dish','barricade','anti-radar','engine block','air horn',
- 'grand coin','premium battlepass','playboy family','nationality','sexual','medkit','pills','tincture soup','gang hq','black market'
-];
+    <!-- Control Center for Material UI Kit: parallax effects, scripts for the example pages etc -->
+    <!--  Google Maps Plugin    -->
 
-const VEHICLE_HINTS = ['car','truck','motorcycle','bike','boat','helicopter','plane','monowheel'];
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTTfWur0PDbZWPr7Pmq8K3jiDp0_xUziI"></script>
+    <script src="./assets/js/material-kit.min.js?v=3.0.4" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
+    <script src="./data.js"></script>
+    <script src="./script.js"></script>
 
-const QUAL_MAP = {1:'low quality',2:'medium quality',3:'high quality',4:'max quality'};
-
-/* --------------------------- Theme Toggle --------------------------- */
-(function initTheme(){
-  const apply = mode => document.documentElement.classList.toggle('light', mode==='light');
-  const saved = localStorage.getItem('li-theme') || 'dark';
-  apply(saved);
-  document.querySelector('header .toggle').addEventListener('click', ()=>{
-    const next = document.documentElement.classList.contains('light')?'dark':'light';
-    localStorage.setItem('li-theme', next); apply(next);
-  });
-})();
-
-/* --------------------------- Money Formatting --------------------------- */
-function formatMoneyFromText(txt){
-  if(!txt) return 'Negotiable';
-  const t = String(txt).trim().toLowerCase();
-  if (t==='negotiable' || t==='nego') return 'Negotiable';
-
-  // capture things like "20k", "1.7k", "50m", "1.5m", "150000", "$2,000", "2.000"
-  const m = t.match(/(\d+(\.\d+)?)(\s*)(k|m|million|mil)?/i);
-  if(!m) return 'Negotiable';
-  let n = parseFloat(m[1]);
-  const unit = (m[4]||'').toLowerCase();
-
-  // normalize by unit
-  if(unit==='k') n = n*1000;
-  else if(unit==='m' || unit==='million' || unit==='mil') n = n*1000000;
-
-  // >= 1,000,000 -> "$X.Y Million"
-  if(n >= 1000000){
-    const millions = Math.round(n/100000)/10; // one decimal
-    // keep one decimal only when needed
-    const s = (Number.isInteger(millions)? millions.toFixed(0) : millions.toFixed(1));
-    return `$${s} Million`;
-  }
-
-  // thousands with dot separators
-  const thousands = Math.round(n);
-  return '$' + thousands.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-}
-
-/* --------------------------- Detect / Normalize --------------------------- */
-function hasBlacklist(raw){
-  const r = raw.toLowerCase();
-  return BLACKLIST.find(w=> r.includes(w));
-}
-
-function detectAction(raw){
-  const r = raw.toLowerCase();
-  if(/selling\s*or\s*trading|sell(?:ing)?\s*or\s*trade/.test(r)) return 'Selling or trading';
-  if(/\btrading\b|\btrade\b/.test(r)) return 'Trading';
-  if(/\brenting out\b|\brent out\b/.test(r)) return 'Renting out';
-  if(/\brenting\b/.test(r)) return 'Renting';
-  if(/\bbuying\b|\bwtb\b|\blooking to (buy|purchase)\b|\bwant to buy\b/.test(r)) return 'Buying';
-  if(/\bselling\b|\bwts\b|\bfor sale\b/.test(r)) return 'Selling';
-  // fallbacks from intent words
-  if(/\bbudget\b/.test(r)) return 'Buying';
-  if(/\bprice\b/.test(r)) return 'Selling';
-  return 'Selling';
-}
-
-function detectCategory(raw){
-  const r = raw.toLowerCase();
-  // Hard signals
-  if(/\bhouse|apartment|mansion|penthouse|casino apartment|casino penthouse|g\.s\.|w\.h\.|№|no\.?\s*\d+/.test(r)) return 'Real Estate';
-  if(BUSINESS_LIST.some(b=> r.includes(b.toLowerCase())) || /\bbusiness\b|\bstate object\b|\bplantation\b/.test(r)) return 'Business';
-  if(/\blooking for\b/.test(r) && /\b(poker|wife|husband|boyfriend|girlfriend|family|friends|valentine|date)\b/.test(r)) return 'Dating';
-  if(/\bhiring\b|\blooking for work\b|\bjob\b|\bconstruction site\b/.test(r)) return 'Work';
-  if(VEHICLE_HINTS.some(v=> r.includes(v))) return 'Auto';
-  // vehicle names quoted "Brand Model"
-  if(/"[^"]+"\s*(with|at|price|budget|rent|$)/i.test(raw)) return 'Auto';
-  return 'Other';
-}
-
-function normalizeOpenSentence(raw, action, cat){
-  let text = raw.trim();
-
-  // map "looking to buy/purchase" → Buying; assure first word capitalization
-  text = text.replace(/^\s*looking to (buy|purchase)/i,'Buying')
-             .replace(/^\s*buying/i,'Buying')
-             .replace(/^\s*selling or trading/i,'Selling or trading')
-             .replace(/^\s*trading/i,'Trading')
-             .replace(/^\s*selling/i,'Selling')
-             .replace(/^\s*renting out/i,'Renting out')
-             .replace(/^\s*renting/i,'Renting');
-
-  // Level → quality (engine, transmission, suspension, tires, inventory…)
-  text = text.replace(/\blevel\s*(1|2|3|4)\b/gi, (_,d)=> QUAL_MAP[+d]);
-
-  // “no/number” → №
-  text = text.replace(/\b(?:house|apartment|mansion|penthouse|casino apartment)\s*(?:no\.?|number|#)\s*(\d+)/gi,(m)=>{
-    const num = m.match(/(\d+)/)[1];
-    return m.replace(/(house|apartment|mansion|penthouse|casino apartment).*/i, (seg)=>{
-      const name = seg.match(/house|apartment|mansion|penthouse|casino apartment/i)[0];
-      return `${name} №${num}`;
-    });
-  });
-
-  // Casino apartment → Casino penthouse
-  text = text.replace(/casino apartment/gi,'Casino penthouse');
-
-  // tuning/feature word maps
-  text = text.replace(/\b(body upgrades|body kit)\b/gi,'visual upgrades')
-             .replace(/\b(turbo)\b/gi,'turbo kit')
-             .replace(/\b(drift tuning|drift assistance)\b/gi,'drift kit')
-             .replace(/\b(luminous rims|unique wheels)\b/gi,'luminous wheels')
-             .replace(/\b(crates|cases)\b/gi,'containers')
-             .replace(/\b(spray cans|spray balloons)\b/gi,'paint cans')
-             .replace(/\bextras\b/gi,'of type')
-             .replace(/\bscarf\b/gi,'mask');
-
-  // partial/full configuration
-  text = text.replace(/\b(max config|max tuning|fully upgraded)\b/gi,'with full configuration')
-             .replace(/\b(nearly max|partial|lvl\s*3|level 3|level 2|lvl\s*2|level 1|lvl\s*1)\b/gi,'with partial configuration');
-
-  return text;
-}
-
-/* Real Estate features ordering */
-function orderRealEstate(subject){
-  // pick features
-  const feats = [];
-  const got = s=>subject.toLowerCase().includes(s);
-  if(got('garden')) feats.push('a garden');
-  const gs = subject.match(/\b(2|5|9|25)\s*g\.s\.|\b(2|5|9|25)\s*gs\b/i);
-  if(gs){ const v=(gs[0].match(/\d+/)||[''])[0]; feats.push(`${v} g.s.`); }
-  const wh = subject.match(/\b(3|4|5)\s*w\.h\.|\b(3|4|5)\s*wh\b/i);
-  if(wh){ const v=(wh[0].match(/\d+/)||[''])[0]; feats.push(`${v} w.h.`); }
-  if(got('custom interior')) feats.push('custom interior');
-  if(got('insurance')) feats.push('insurance');
-  if(got('helipad')) feats.push('helipad');
-
-  // other nice features
-  ['swimming pool','tennis court','long driveway','large driveway','spacious backyard','backyard'].forEach(k=>{
-    if(got(k)) feats.push(k.replace('large','long').replace('backyard','spacious backyard'));
-  });
-
-  // views
-  const vm = subject.match(/\b(nice|beautiful|great)\s+views?/i);
-  if(vm) feats.push(vm[1] + ' views');
-
-  // Location (capitalize if official)
-  let loc = '';
-  OFFICIAL_PLACES.forEach(p=>{
-    if(subject.toLowerCase().includes(p.toLowerCase())) loc = p;
-  });
-
-  // Build ordered feature string
-  const joined = feats.length
-      ? ' with ' + feats.slice(0,-1).join(', ') + (feats.length>1?', and ':'') + feats.slice(-1) + (loc ? ' in ' + loc : '')
-      : (loc ? ' in ' + loc : '');
-
-  // Ensure “house/apartment …” base
-  let base = subject;
-  if(!/house|apartment|mansion|Casino penthouse/i.test(base)){
-    base = 'a house' + joined;
-  } else {
-    // remove existing unordered features chunk heuristically:
-    base = base.replace(/\swith .*$/i,'') + joined;
-  }
-  return base;
-}
-
-/* Subject extraction */
-function extractSubject(raw, cat){
-  let s = raw;
-
-  // quoted vehicle names stay quoted
-  const quoted = raw.match(/"[^"]+"/);
-  if(quoted) s = quoted[0];
-
-  // houses etc with numbers → “house №85 …”
-  const prop = raw.match(/\b(house|apartment|mansion|casino (?:apartment|penthouse))\b[^.]*?(?:no\.?|number|#)?\s*(\d+)?/i);
-  if(cat==='Real Estate' && prop){
-    let name = prop[1].replace(/casino apartment/i,'Casino penthouse');
-    const num = prop[2];
-    s = num ? `${name} №${num}` : `a ${name}`;
-    // add feature words from raw
-    const plus = [];
-    if(/\bgarden\b/i.test(raw)) plus.push('a garden');
-    if(/\b(2|5|9|25)\s*g\.s?\.?/i.test(raw)) plus.push(RegExp.$1 + ' g.s.');
-    if(/\b(3|4|5)\s*w\.h\.?/i.test(raw)) plus.push(RegExp.$1 + ' w.h.');
-    if(/\bcustom (?:interior|furniture)\b/i.test(raw)) plus.push('custom interior');
-    if(/\binsurance\b/i.test(raw)) plus.push('insurance');
-    if(plus.length) s += ' with ' + plus.join(', ');
-    return orderRealEstate(s);
-  }
-
-  // generic items (e.g., “level 3 pickaxe”)
-  // normalize “level N → quality”
-  s = s.replace(/\blevel\s*(1|2|3|4)\b/gi,(_,d)=> QUAL_MAP[+d]);
-
-  // default to cleaned trimmed words without money words
-  s = s.replace(/\b(price|budget|rent)\b[^.,;]*/gi,'').trim();
-
-  // Capitalize first letter always
-  if(s.length) s = s[0].toUpperCase() + s.slice(1);
-  return s;
-}
-
-/* Amount extraction */
-function detectAmount(raw){
-  const r = raw.toLowerCase();
-
-  // explicit numeric after keywords
-  let m = r.match(/(?:price|budget|rent|bet)\s*[:\-]?\s*\$?\s*([\d.,]+(?:\s*[km]|m|k)?)/i);
-  if(!m) m = r.match(/\$?\s*([\d.,]+(?:\s*[km]|m|k))(?:\s*each)?/i);
-  if(!m) return 'Negotiable';
-
-  const val = m[1].replace(/[, ]/g,'');
-  return formatMoneyFromText(val);
-}
-
-/* End punctuation rule */
-function ensureEndPunctuation(txt){
-  return /\d$/.test(txt) ? txt : (txt.endsWith('.') ? txt : txt + '.');
-}
-
-/* Build the final ad */
-function buildAd({action, cat, subject, amount}){
-  // auto money label
-  let label = MONEY_LABEL[action] || 'Price:';
-  if(amount==='Negotiable') amount = 'Negotiable';
-
-  // Real-Estate “Selling an apartment/house…” rule (“a/an” if no number)
-  if(cat==='Real Estate' && /^(house|apartment|mansion|Casino penthouse)\b/i.test(subject)===false){
-    // add an article when missing
-    if(!subject.startsWith('a ') && !subject.startsWith('an ') && !subject.includes('№')) subject = 'a ' + subject;
-  }
-
-  const base = `${action} ${subject}. ${label} ${amount}`;
-  // remove period when ends with a pure number value (e.g., … $20.000)
-  return /\$\d[\d.]*$| Million$/.test(base) ? base : ensureEndPunctuation(base);
-}
-
-/* --------------------------- Badges --------------------------- */
-function setChips(list){
-  $.chips.innerHTML = '';
-  list.forEach(x=>{
-    const c = document.createElement('span'); c.className='chip'; c.textContent=x; $.chips.appendChild(c);
-  });
-}
-
-/* --------------------------- Learning Rules --------------------------- */
-const RULE_KEY='li_rules_v1';
-function loadRules(){ try{ return JSON.parse(localStorage.getItem(RULE_KEY)||'[]'); }catch{ return [] } }
-function saveRules(r){ localStorage.setItem(RULE_KEY, JSON.stringify(r)); }
-function addRule(raw, patch){
-  const rules = loadRules().filter(x=>x.raw!==raw.toLowerCase().trim());
-  rules.unshift({raw:raw.toLowerCase().trim(), patch});
-  saveRules(rules);
-  updateRuleInfo();
-}
-function findRule(raw){
-  const r = raw.toLowerCase().trim();
-  return loadRules().find(x=> r===x.raw);
-}
-function updateRuleInfo(){
-  const n = loadRules().length;
-  $.ruleInfo.textContent = n ? `${n} rule${n>1?'s':''} saved. These will auto-apply to matching raw ads before parsing.` : 'No rules saved yet.';
-}
-
-/* --------------------------- Main Parse Flow --------------------------- */
-function parseRaw(){
-  const raw = $.raw.value.trim();
-  if(!raw){ $.out.value=''; setChips([]); return; }
-
-  // learning pre-patch
-  if($.autoApply.checked){
-    const rule = findRule(raw);
-    if(rule){
-      if(rule.patch.opener) $.mfOpen.value = rule.patch.opener;
-      if(rule.patch.subject) $.mfSub.value = rule.patch.subject;
-      if(rule.patch.amount) $.mfAmt.value = rule.patch.amount;
-      if(rule.patch.label) $.mfLabel.value = rule.patch.label;
-    }
-  }
-
-  // blacklist
-  const bad = hasBlacklist(raw);
-  if(bad){
-    $.out.value = `Rejected: Cannot promote illegal/blacklisted content (“${bad}”).`;
-    setChips(['Rejected','Blacklist']);
-    return;
-  }
-
-  // detect
-  const action = $.mfOpen.value.startsWith('Auto') ? detectAction(raw) : $.mfOpen.value;
-  const cat = detectCategory(raw);
-  const normalized = normalizeOpenSentence(raw, action, cat);
-  let subject = $.mfSub.value ? $.mfSub.value.trim() : extractSubject(normalized, cat);
-  let amount = $.mfAmt.value ? $.mfAmt.value.trim() : detectAmount(raw);
-  const labelAuto = MONEY_LABEL[action] || 'Price:';
-  const label = $.mfLabel.value.startsWith('Auto') ? labelAuto : $.mfLabel.value;
-
-  // Final sentence
-  let ad = `${action} ${subject}. ${label} ${formatMoneyFromText(amount)}`;
-  ad = /\$\d[\d.]*$| Million$|Negotiable$|each$/.test(ad) ? ad : ensureEndPunctuation(ad);
-
-  // Bad ending dot rule when ends with number → already handled above
-
-  $.out.value = ad;
-  $.mfCat.value = cat;
-  setChips([`Detected: ${cat}`, `Action: ${action}`, `Money label: ${label.replace(':','')}`, 'Capitalization ✓', 'End punctuation ✓']);
-}
-
-/* --------------------------- Events --------------------------- */
-$.gen.addEventListener('click', parseRaw);
-$.clear.addEventListener('click', ()=>{
-  $.raw.value=''; $.out.value=''; setChips([]); $.mfSub.value=''; $.mfAmt.value=''; $.mfOpen.value='Auto (detected)'; $.mfLabel.value='Auto (detected)'; $.mfCat.value='';
-});
-$.copy.addEventListener('click', ()=>{
-  $.out.select(); document.execCommand('copy');
-});
-
-function applyFromManual(save){
-  const raw = $.raw.value.trim();
-  if(!raw) return;
-
-  const patch = {
-    opener: $.mfOpen.value.startsWith('Auto') ? '' : $.mfOpen.value,
-    subject: $.mfSub.value.trim(),
-    amount: $.mfAmt.value.trim(),
-    label: $.mfLabel.value.startsWith('Auto') ? '' : $.mfLabel.value
-  };
-  // save rule?
-  if(save){
-    addRule(raw, patch);
-  }
-  parseRaw();
-}
-
-$.apply.addEventListener('click', ()=>applyFromManual(false));
-$.applySave.addEventListener('click', ()=>applyFromManual(true));
-$.autoApply.checked = localStorage.getItem('li_auto_apply')==='1';
-$.autoApply.addEventListener('change', ()=> localStorage.setItem('li_auto_apply', $.autoApply.checked?'1':'0'));
-updateRuleInfo();
-
-/* --------------------------- Auto money label on opener change --------------------------- */
-$.mfOpen.addEventListener('change', ()=>{
-  if($.mfOpen.value && !$.mfOpen.value.startsWith('Auto')){
-    const guess = MONEY_LABEL[$.mfOpen.value] || 'Price:';
-    $.mfLabel.value = guess;
-  } else {
-    $.mfLabel.value = 'Auto (detected)';
-  }
-});
-
-/* --------------------------- Demo examples (optional) --------------------------- */
-if(!location.hash && !localStorage.getItem('li_first')){
-  $.raw.value = 'selling plantation business no 5 price 50m';
-  localStorage.setItem('li_first','1');
-}
-</script>
+    <script type="text/javascript">
+        // if (document.getElementById("state1")) {
+        //   const countUp = new CountUp(
+        //     "state1",
+        //     document.getElementById("state1").getAttribute("countTo")
+        //   );
+        //   if (!countUp.error) {
+        //     countUp.start();
+        //   } else {
+        //     console.error(countUp.error);
+        //   }
+        // }
+        // if (document.getElementById("state2")) {
+        //   const countUp1 = new CountUp(
+        //     "state2",
+        //     document.getElementById("state2").getAttribute("countTo")
+        //   );
+        //   if (!countUp1.error) {
+        //     countUp1.start();
+        //   } else {
+        //     console.error(countUp1.error);
+        //   }
+        // }
+        // if (document.getElementById("state3")) {
+        //   const countUp2 = new CountUp(
+        //     "state3",
+        //     document.getElementById("state3").getAttribute("countTo")
+        //   );
+        //   if (!countUp2.error) {
+        //     countUp2.start();
+        //   } else {
+        //     console.error(countUp2.error);
+        //   }
+        // }
+    </script>
 </body>
+
 </html>
