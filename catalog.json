@@ -4,17 +4,22 @@
     "weed","cannabis","marijuana","cocaine","drug","balaclava","covid mask","ems mask","surgical mask",
     "radar","scanner","anti-radar","head bag","rope","crowbar","usb with virus","troll ad",
     "animal skin","barricade","satellite dish","engine block","air horn","grand coin","battlepass",
-    "nationality","sexual","sell people","hype body","branded armor","gang","black market","mega mall",
-    "playboy family","driving license","air transport license","boat transport license"
+    "nationality","sexual","sell people","hype body","branded armor","gang","black market"
   ],
+  "banned_party_places": ["lspd","fib","sahp","ems","government","ghetto","mega mall","black market","gang hq","gang"],
+  "whitelist_context": ["weapon shop","ammunition store","charging station"],
+
   "nonsellable_autos_regex": [
-    "(?:^|\\s)p1\\s*car\\b"
+    "(?:^|\\s)p1\\s*car\\b",
+    "benefactor[-\\s]?maybach\\s+gls\\s*600"
   ],
+
   "business_map": {
     "barber":"Hair salon business",
     "barber shop":"Hair salon business",
     "hair salon":"Hair salon business",
     "gun store":"Ammunition Store business",
+    "weapon shop":"Ammunition Store business",
     "weapon store":"Ammunition Store business",
     "drug lab":"Burger shop business",
     "charging station":"Electric station business",
@@ -23,6 +28,7 @@
     "24/7":"24/7 Store business",
     "24/7 store":"24/7 Store business",
     "atm":"ATM business",
+    "atm business":"ATM business",
     "car wash":"Car wash business",
     "chip tuning":"Chip tuning business",
     "clothing shop":"Clothing shop business",
@@ -47,40 +53,25 @@
     "juice shop":"Juice shop business",
     "fight club":"Fight club business"
   },
+
   "container_map": [
     {"pattern":"\\bp1\\s*car\\s*(cases?|containers?)\\b","out":"Progen containers"},
-    {"pattern":"\\bwheels\\s*1\\s*containers?\\b","out":"wheels 1 containers"},
-    {"pattern":"\\bwheels\\s*2\\s*containers?\\b","out":"wheels 2 containers"},
-    {"pattern":"\\bwheels\\s*3\\s*containers?\\b","out":"wheels 3 containers"},
-    {"pattern":"\\bgrand\\s*racers\\s*containers?\\b","out":"Grand racers containers"},
-    {"pattern":"\\bbenefactor\\s*e500\\s*\\(w124\\)\\s*containers?\\b","out":"Benefactor E500 (W124) containers"},
-    {"pattern":"\\bprogen\\s*containers?\\b","out":"Progen containers"}
+    {"pattern":"\\bcar\\s*cases?\\b","out":"car containers"}
   ],
-  "official_places":[
+
+  "vehicle_synonyms": {
+    "supra":"Karin Supra A80",
+    "pista f488":"Grotti Pista (F488)"
+  },
+
+  "clothing_brand_map": { "adidas":"Abibas" },
+
+  "official_places": [
     "Vinewood Hills","Rockford Hills","Richman","Sandy Shores","Paleto Bay","Postal","Hospital","Capitol",
     "Fire Station","Auto Fair","Bahama Mamas Bar","Tequi-la-la Bar","FIB","Hotel Spa Bar",
     "Pacific Bluffs Country Club","Diamond Resort Bar","Vanilla Unicorn Bar","Church","Stock Exchange",
     "Stadium","Chumash","Lifeinvader","Del Perro Pier","Del Perro Beach","Cayo Perico Island",
     "Hotel","Raton Canyon","School","SAHP"
   ],
-  "unofficial_places":[ "airport","autosalon","beach","beach market","ghetto","post office","train station","yacht" ],
-  "re_keywords":{
-    "types":["house","apartment","penthouse","mansion"],
-    "features":{
-      "garden":["garden"],
-      "gs":["(\\b2|5|9|25)\\s*(g\\.?s\\.?)"],
-      "wh":["(\\b3|4|5)\\s*(w\\.?h\\.?)"],
-      "custom":["custom interior"],
-      "insurance":["insurance"],
-      "helipad":["helipad"],
-      "others":["swimming pool","tennis court","long driveway","large driveway","spacious backyard","backyard","nice views","beautiful views","great views","views"]
-    }
-  },
-  "work_roles":["trucker","lawyer","dj","photographer","bodyguard","professional dancer","personal driver","assistant","professional singer","electrician","locksmith","gardener","surveyor","driver"],
-  "work_sites":["construction site №1","construction site №2","construction site №3"],
-  "dating_allowed":[
-    "^looking for (?:[A-Z][a-z]+ [A-Z][a-z]+)\\.?$",
-    "^looking for (?:a )?(?:wife|husband|boyfriend|girlfriend|family|family members|date|valentine|friend|friends)\\.?$",
-    "^looking for casino poker players\\.?$"
-  ]
+  "unofficial_places": ["airport","autosalon","beach","beach market","post office","train station","yacht","ghetto"]
 }
