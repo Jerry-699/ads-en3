@@ -1,0 +1,118 @@
+{
+  "blacklist": [
+    "firearms?", "ammo|ammunition", "bulletproof", "armor plates?", "weed|cannabis|drugs?|cocaine",
+    "surgical mask|medical mask|covid mask", "balaclava", "radar|scanner", "rope|head bag",
+    "usb with virus", "lock ?pick|crowbar", "troll", "animal skin", "anti-?radar",
+    "engine block", "air horn", "grand coin|battlepass", "nationality", "sexual|sex"
+  ],
+
+  "levels": {
+    "1": "low quality",
+    "2": "medium quality",
+    "3": "high quality",
+    "4": "max quality"
+  },
+
+  "openers": [
+    ["^(?:looking\\s*to\\s*buy|looking\\s*to\\s*purchase|ltb)\\b", "Buying"],
+    ["^(?:selling\\s*or\\s*trading|s\\/t)\\b", "Selling or trading"],
+    ["\\bbuying\\b", "Buying"],
+    ["\\bselling\\b", "Selling"],
+    ["\\btrading\\b", "Trading"],
+    ["\\brenting out\\b", "Renting out"],
+    ["\\brenting\\b", "Renting"]
+  ],
+
+  "moneyByOpener": {
+    "Buying": "Budget",
+    "Selling": "Price",
+    "Trading": "Price",
+    "Selling or trading": "Price",
+    "Renting out": "Rent",
+    "Renting": "Budget"
+  },
+
+  "normalizeRegex": [
+    ["max config|max tuning|fully upgraded", "with full configuration"],
+    ["nearly max|part\\s*l?v?l?3?|lvl3?", "with partial configuration"],
+    ["body upgrades|body kit", "visual upgrades"],
+    ["\\bturbo\\b", "turbo kit"],
+    ["drift (tuning|assistance)?", "drift kit"],
+    ["luminous (rims|unique wheels?)|unique wheels", "luminous wheels"],
+    ["extras?", "of type"],
+    ["casino apartment", "Casino penthouse"],
+    ["personal business", "private business"],
+    ["looking to buy|looking to purchase", "Buying"],
+    ["\\b([0-9])k\\b", "$1k"],         /* keep k for money parser */
+    ["\\b([0-9])m\\b", "$1m"]
+  ],
+
+  "autoFeatures": [
+    "with full configuration",
+    "with partial configuration",
+    "visual upgrades",
+    "luminous wheels",
+    "insurance",
+    "turbo kit",
+    "drift kit"
+  ],
+
+  "reFeatures": [
+    "a garden", "2 g.s.", "5 g.s.", "9 g.s.", "25 g.s.",
+    "3 w.h.", "4 w.h.", "5 w.h.",
+    "custom interior",
+    "insurance",
+    "helipad",
+    "swimming pool", "tennis court", "long driveway", "spacious backyard",
+    "nice views", "beautiful views", "great views"
+  ],
+
+  "categories": {
+    "Real Estate": ["house", "apartment", "penthouse", "mansion", "casino penthouse"],
+    "Auto": ["car", "truck", "motorcycle", "bike", "atv", "boat", "helicopter", "plane", "monowheel", "license plate"],
+    "Business": [
+      "ammunition store","bar","car wash","chip tuning","clothing shop","cowshed","electric station","farm","flower shop",
+      "freight train","gas station","hair salon","jewelry store","oil well","parking","plantation","car sharing","state object",
+      "service station","24/7 store","tattoo studio","taxi company","atm","juice shop","burger shop","warehouse","fight club"
+    ],
+    "Work": ["hiring","looking for work","job","construction site","driver","lawyer","dj","photographer","bodyguard","assistant","trucker","professional dancer","professional singer"],
+    "Dating": ["looking for","boyfriend","girlfriend","family","valentine","friends","casino poker players"],
+    "Discounts": ["discount %","% discount","% off"],
+    "Services": ["happy hour","template","join","offering","service"]
+  },
+
+  "otherSubjects": [
+    /* Tuning parts + qualities */
+    "low quality engine tuning","medium quality engine tuning","high quality engine tuning","max quality engine tuning",
+    "low quality transmission tuning","medium quality transmission tuning","high quality transmission tuning","max quality transmission tuning",
+    "low quality suspension tuning","medium quality suspension tuning","high quality suspension tuning","max quality suspension tuning",
+    "low quality brakes tuning","medium quality brakes tuning","high quality brakes tuning","max quality brakes tuning",
+    "low quality tires tuning","medium quality tires tuning","high quality tires tuning","max quality tires tuning",
+
+    /* Generic items (ensure pickaxe present) */
+    "pickaxe","fishing rod","inventory","battery","charger","repair kit","video card","wires","timber","thread","snow","token","tonic treat",
+    "elixir for a pet","leash","luminous wheels","paint can","pearl","pet food","dice",
+
+    /* Tickets */
+    "grand ticket","rare lottery ticket","regular lottery ticket","flame and water lottery ticket","cayo perico ticket","car ticket",
+    "secret ticket","secret ticket fragment",
+
+    /* Fruits/vegetables */
+    "pineapple fruits","mandarin fruits","strawberry fruits","cabbage vegetables","mushroom seeds","milk",
+
+    /* Fish */
+    "perch","carp","salmon","trout",
+
+    /* Containers (examples – add more freely) */
+    "valuable container","racer container","drifter 2 container","wheels 1 container","wheels 2 container","wheels 3 container",
+    "ingrand container","progen container","benefactor container","organization container","valentine 2025 container",
+    "old summer gold container","old winter gold container","daily container","arena container","halloween container",
+
+    /* Pets (caged/shoulder) */
+    "cage with a pet","cage with a Border Collie","cage with a Cougar","cage with a Cyberdog","cage with a Panda","cage with a Duckling",
+    "six tailed fox on shoulder pet","hamster on shoulder pet","toothless dragon on shoulder pet","black voron on shoulder pet",
+
+    /* Resource barrels */
+    "solar barrel","gasoline barrel","kerosene barrel"
+  ]
+}
